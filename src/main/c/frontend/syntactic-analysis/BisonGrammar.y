@@ -23,6 +23,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %define parse.error detailed
 %locations
 
+// TODO define here datatypes for interpreter
 %union {
 	/** Terminals. */
 
@@ -48,7 +49,9 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %destructor { destroyConstant($$); } <constant>
 %destructor { destroyExpression($$); } <expression>
 %destructor { destroyFactor($$); } <factor>
+//TODO build our own destructor for our datatypes
 
+// TODO define data type for each symbol in the entry
 /** Terminals. */
 %token <integer> INTEGER
 %token <token> ADD
@@ -71,6 +74,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <factor> factor
 %type <program> program
 
+// TODO define precedence and associativity
 /**
  * Precedence and associativity.
  *
@@ -80,8 +84,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %left ADD SUB
 %left MUL DIV
 
+// TODO DEFINE Grammar here
 %%
-
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
 program: expression											{ $$ = ExpressionProgramSemanticAction($1); }

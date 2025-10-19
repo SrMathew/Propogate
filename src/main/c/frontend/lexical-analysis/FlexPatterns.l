@@ -44,6 +44,7 @@ extern CompilationStatus UnknownLexemeAction();
  */
 whitespace			[[:space:]]+
 
+// TODO define symbols here
 %%
 
 %{
