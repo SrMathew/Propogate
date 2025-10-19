@@ -14,6 +14,7 @@
  * @see https://westes.github.io/flex/manual/Definitions-Section.html#Definitions-Section
  */
 
+// TODO check which function will be recycle, modified or deleted
 extern CompilationStatus ArithmeticOperatorLexemeAction(TokenLabel label);
 extern CompilationStatus EnterImportExpressionLexemeAction(FlexContext context);
 extern CompilationStatus EnterMultilineCommentLexemeAction(FlexContext context);
@@ -55,26 +56,31 @@ whitespace			[[:space:]]+
 
 %}
 
+
 "{"									{ return EnterImportExpressionLexemeAction(IMPORT_EXPRESSION); }
 <IMPORT_EXPRESSION>[^{}]+			{ return SubexpressionLexemeAction(); }
 <IMPORT_EXPRESSION>"}"				{ return LeaveImportExpressionLexemeAction(); }
 <IMPORT_EXPRESSION>.				{ return UnknownLexemeAction(); }
 
+// TODO recycle the below comments actions and ...symbols? (check for LaTex equivalent)
 "/*"								{ return EnterMultilineCommentLexemeAction(MULTILINE_COMMENT); }
 <MULTILINE_COMMENT>"*/"				{ return LeaveMultilineCommentLexemeAction(); }
 <MULTILINE_COMMENT>[^*]+			{ return IgnoredLexemeAction(); }
 <MULTILINE_COMMENT>.				{ return IgnoredLexemeAction(); }
 
+// TODO notice all the following are equivalent to : and, or, neg, ->
 "-"									{ return ArithmeticOperatorLexemeAction(SUB); }
 "*"									{ return ArithmeticOperatorLexemeAction(MUL); }
 "/"									{ return ArithmeticOperatorLexemeAction(DIV); }
 "+"									{ return ArithmeticOperatorLexemeAction(ADD); }
 
+// TODO recycle Parenthesis symbols and functions below
 "("									{ return ParenthesisLexemeAction(OPEN_PARENTHESIS); }
 ")"									{ return ParenthesisLexemeAction(CLOSE_PARENTHESIS); }
 
 [[:digit:]]+						{ return IntegerLexemeAction(); }
 
+// TODO all the following will be recycle
 {whitespace}						{ return IgnoredLexemeAction(); }
 .									{ return UnknownLexemeAction(); }
 
