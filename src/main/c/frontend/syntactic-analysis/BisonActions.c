@@ -39,7 +39,7 @@ static void _logSyntacticAnalyzerAction(const char * functionName) {
 Variable * StringVariableSemanticAction(const char* variable) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Variable * newVariable = calloc(1, sizeof(Variable));
-	newVariable->variable = variable;
+	newVariable->variable = strdup(variable);
 	return newVariable;
 }
 
@@ -66,7 +66,7 @@ Formula * VariableFormulaSemanticAction(Variable * variable) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Formula * formula = calloc(1, sizeof(Formula));
 	formula->variable = variable;
-	formula->formulaType = VAR_SYMBOL;
+	formula->formulaType = VAR_FORMULA;
 	return formula;
 }
 

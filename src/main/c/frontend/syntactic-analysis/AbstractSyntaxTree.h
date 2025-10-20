@@ -44,12 +44,12 @@ enum FormulaType
 {
 	BINARY,
 	UNARY,
-	VARIABLE_TYPE
+	VAR_FORMULA
 };
 
 struct Variable
 {
-	const char * variable;
+	char * variable;
 };
 
 struct Formula

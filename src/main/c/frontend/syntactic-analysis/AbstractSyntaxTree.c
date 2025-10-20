@@ -31,7 +31,7 @@ void destroyFormula(Formula *formula) {
 			case UNARY:
 				destroyFormula(formula->formula);
 				break;
-			case VARIABLE_TYPE:
+			case VAR_FORMULA:
 				destroyVariable(formula->variable);
 				break;
 		}
@@ -42,7 +42,7 @@ void destroyFormula(Formula *formula) {
 void destroyVariable(Variable *variable) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (variable != NULL) {
-		// free(variable->variable);
+		free(variable->variable);
 		free(variable);
 	}
 }
