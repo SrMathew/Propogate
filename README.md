@@ -1,64 +1,59 @@
-[![✗](https://img.shields.io/badge/Release-v2.0.0-ffb600.svg?style=for-the-badge)](https://github.com/agustin-golmar/Flex-Bison-Compiler/releases)
+[![✗](https://img.shields.io/badge/Release-v2.0.0-ffb600.svg?style=for-the-badge)](https://github.com/SrMathew/Propogate)
 
-[![✗](https://github.com/agustin-golmar/Flex-Bison-Compiler/actions/workflows/pipeline.yaml/badge.svg?branch=production)](https://github.com/agustin-golmar/Flex-Bison-Compiler/actions/workflows/pipeline.yaml)
+[![✗](https://github.com/SrMathew/Propogate/actions/workflows/pipeline.yaml/badge.svg?branch=production)](https://github.com/SrMathew/Propogate/actions/workflows/pipeline.yaml)
 
-# Flex-Bison-Compiler
+# Propogate
 
-A base compiler example, developed with Flex and Bison.
+Un generador de diagramas lógicos a partir de fórmulas de primer orden mediante archivos LaTeX, desarrollado con Flex y Bison.
 
-* [Requirements](#requirements)
-* [Configuration](#configuration)
-* [Commands](#commands)
-* [CI/CD](#cicd)
-* [Recommended Extensions](#recommended-extensions)
+## Notas de la versión
 
-## Requirements
+El proyecto cuenta con varios errores, a notar:
+- No están implementadas las funcionalidades de:
+    - definir fórmulas (caso de uso del test 8)
+    - asignar valores
+    - definir múltiples fórmulas o variables individualmente (caso de uso de los tests 7 y 2 respectivamente)
+    - utilizar un conector unario con una variable sin el uso de paréntesis (caso de uso el test 3, probablemente sea descartado)
+    - indicar un archivo LaTeX donde no se usa el comando especificado
+    - exigir el uso del comando (\newcommand{...} en el archivo LaTeX) 
+- Hay un problema de memory leak que causa que la ejecución de todos los tests fallen, aunque sean exitosos.
+- Los tests de rechazo 1, 2, 3, 9 rechazan por motivos explicitados anteriormente y no por su definición.
+
+## Requisitos
 
 * [Docker v28.3.2](https://www.docker.com/)
 
-## Configuration
+## Comandos
 
-Set the following environment variables to control and configure the behaviour of the application:
+### Inicio
 
-| Name                  | Default | Description                                                                                                                                                           |
-| :-------------------- | :-----: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ENVIRONMENT`         | `Local` | The active environment name. The available environments are: `Local`, `Development` and `Production`.                                                                 |
-| `LOG_IGNORED_LEXEMES` | `true`  | When `true`, logs all of the ignored lexemes found with Flex at `DEBUGGING` level. To remove those logs from the console output set it to `false`.                    |
-| `LOGGING_LEVEL`       | `ALL`   | The minimum level to log in the console output. From lower to higher, the available levels are: `ALL`, `DEBUGGING`, `INFORMATION`, `WARNING`, `ERROR` and `CRITICAL`. |
-
-_Docker Compose_ can read the variables from an `.env` file too (see `compose.yaml` file).
-
-## Commands
-
-### Start
-
-Rises an ephemeral container, ready to start development:
+Inicia un contenedor temporal:
 
 ```bash
 docker compose run --rm compiler
 ```
 
-### Build
+### Compilación
 
-Builds or rebuilds the entire compiler:
+Construye el compilador:
 
 ```bash
 src/main/bash/build.sh
 ```
 
-### Run
+### Ejecución
 
-Compiles a program:
+Compila un programa:
 
 ```bash
 src/main/bash/run.sh <program>
 ```
 
-where `<program>` is the path to the file that represents its entry-point.
+donde `<program>` es el path al archivo entry-point.
 
-### Test
+### Tests
 
-Executes every available unit-test under `src/test/c` folder:
+Ejecuta todos los tests disponibles en el directorio `src/test/c`:
 
 ```bash
 src/main/bash/test.sh
@@ -66,37 +61,9 @@ src/main/bash/test.sh
 
 ### Stop
 
-Logout, destroy the ephemeral containers and shutdowns the cluster:
+Cierra sesión, destruye los contenedores creados, y apaga el cluster:
 
 ```bash
 exit
 docker compose down
 ```
-
-### Docker
-
-| Command                                 | Description                                             |
-| :-------------------------------------- | :------------------------------------------------------ |
-| `docker builder prune --all`            | Removes all builds and complete build cache.            |
-| `docker compose --progress=plain build` | Forces a build or rebuild of the images in the cluster. |
-| `docker image prune`                    | Removes all of the dangling images from Docker.         |
-| `docker network prune`                  | Removes unused networks from Docker.                    |
-| `docker volume prune`                   | Removes unused volumes from Docker.                     |
-
-## CI/CD
-
-To trigger an automatic integration on every push or PR (_Pull Request_), you must activate _GitHub Actions_ in the _Settings_ tab. Use the following configuration:
-
-| Key                                                        | Value                                               |
-| :--------------------------------------------------------- | :-------------------------------------------------- |
-| `Actions permissions`                                      | `Allow all actions and reusable workflows`          |
-| `Allow GitHub Actions to create and approve pull requests` | `false`                                             |
-| `Artifact and log retention`                               | `30 days`                                           |
-| `Fork pull request workflows from outside collaborators`   | `Require approval for all outside collaborators`    |
-| `Workflow permissions`                                     | `Read repository contents and packages permissions` |
-
-## Recommended Extensions
-
-* [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
-* [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
-* [Yash](https://marketplace.visualstudio.com/items?itemName=daohong-emilio.yash)
