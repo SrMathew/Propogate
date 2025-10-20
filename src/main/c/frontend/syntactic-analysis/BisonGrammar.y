@@ -57,6 +57,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 %token <token> EQUALS
 
+%token <token> SEPARATOR
+
 %token <token> OPEN_PARENTHESIS
 %token <token> CLOSE_PARENTHESIS
 
@@ -92,7 +94,9 @@ formula: // NEG OPEN_PARENTHESIS formula[left] OR formula[right] AND OPEN_PARENT
 	| OPEN_PARENTHESIS formula[left] IMPLY formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, IMPLY_TYPE); }
 	| NEG OPEN_PARENTHESIS formula CLOSE_PARENTHESIS							{ $$ = UnaryFormulaSemanticAction($3, NEG_TYPE); }
 	| OPEN_PARENTHESIS formula CLOSE_PARENTHESIS								{ $$ = UnaryFormulaSemanticAction($2, NOTHING); }
+//	| formula SEPARATOR															{ $$ = NULL; }
 //	| formula																	{ $$ = UnaryFormulaSemanticAction($1, NOTHING); } //TODO: commented because of r/r
+//	| NEG variable																//TODO: abuso de notacion, pero deberia ser valido
 	| variable																	{ $$ = VariableFormulaSemanticAction($1); }
 	//form_symbol?
 	;

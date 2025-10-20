@@ -49,7 +49,7 @@ enum FormulaType
 
 struct Variable
 {
-	char * variable;
+	const char * variable;
 };
 
 struct Formula

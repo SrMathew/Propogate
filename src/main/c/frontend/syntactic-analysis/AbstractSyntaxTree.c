@@ -42,6 +42,7 @@ void destroyFormula(Formula *formula) {
 void destroyVariable(Variable *variable) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (variable != NULL) {
+		// free(variable->variable);
 		free(variable);
 	}
 }
