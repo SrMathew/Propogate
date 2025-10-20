@@ -123,7 +123,6 @@ CompilationStatus EnterPropogateLexemeAction(FlexContext context) {
 }
 
 CompilationStatus LeavePropogateLexemeAction() {
-	pushInputBuffer(_inputBuffer);
 	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
 	if (_logIgnoredLexemes) {
 		Token * token = createToken(_lexicalAnalyzer, IGNORED);
