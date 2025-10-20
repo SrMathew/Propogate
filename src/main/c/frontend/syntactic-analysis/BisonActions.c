@@ -36,50 +36,44 @@ static void _logSyntacticAnalyzerAction(const char * functionName) {
 
 /* PUBLIC FUNCTIONS */
 
-Constant * IntegerConstantSemanticAction(const int value) {
+Variable * StringVariableSemanticAction(const char* variable) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Constant * constant = calloc(1, sizeof(Constant));
-	constant->value = value;
-	return constant;
+	Variable * newVariable = calloc(1, sizeof(Variable));
+	newVariable->variable = variable;
+	return newVariable;
 }
 
-Expression * ArithmeticExpressionSemanticAction(Expression * leftExpression, Expression * rightExpression, ExpressionType type) {
+Formula * BinaryFormulaSemanticAction(Formula * leftFormula, Formula * rightFormula, BinaryFormulaType formulaType) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Expression * expression = calloc(1, sizeof(Expression));
-	expression->leftExpression = leftExpression;
-	expression->rightExpression = rightExpression;
-	expression->type = type;
-	return expression;
+	Formula * formula = calloc(1, sizeof(Formula));
+	formula->leftFormula = leftFormula;
+	formula->rightFormula = rightFormula;
+	formula->binaryFormulaType = formulaType;
+	formula->formulaType = BINARY;
+	return formula;
 }
 
-Expression * FactorExpressionSemanticAction(Factor * factor) {
+Formula * UnaryFormulaSemanticAction(Formula * formula, UnaryFormulaType formulaType) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Expression * expression = calloc(1, sizeof(Expression));
-	expression->factor = factor;
-	expression->type = FACTOR;
-	return expression;
+	Formula * newFormula = calloc(1, sizeof(Formula));
+	newFormula->formula = formula;
+	newFormula->unaryFormulaType = formulaType;
+	formula->formulaType = UNARY;
+	return newFormula;
 }
 
-Factor * ConstantFactorSemanticAction(Constant * constant) {
+Formula * VariableFormulaSemanticAction(Variable * variable) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Factor * factor = calloc(1, sizeof(Factor));
-	factor->constant = constant;
-	factor->type = CONSTANT;
-	return factor;
+	Formula * formula = calloc(1, sizeof(Formula));
+	formula->variable = variable;
+	formula->formulaType = VAR_SYMBOL;
+	return formula;
 }
 
-Factor * ExpressionFactorSemanticAction(Expression * expression) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Factor * factor = calloc(1, sizeof(Factor));
-	factor->expression = expression;
-	factor->type = EXPRESSION;
-	return factor;
-}
-
-Program * ExpressionProgramSemanticAction(Expression * expression) {
+Program * FormulaProgramSemanticAction(Formula * formula) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
-	program->expression = expression;
+	program->formula = formula;
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }

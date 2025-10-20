@@ -14,65 +14,77 @@ ModuleDestructor initializeAbstractSyntaxTreeModule();
  * person, but without the madness).
  */
 
-typedef enum ExpressionType ExpressionType;
-typedef enum FactorType FactorType;
+typedef enum BinaryFormulaType BinaryFormulaType;
+typedef enum UnaryFormulaType UnaryFormulaType;
+typedef enum FormulaType FormulaType;
 
-typedef struct Constant Constant;
-typedef struct Expression Expression;
-typedef struct Factor Factor;
+typedef struct Variable Variable;
+typedef struct Formula Formula;
+
 typedef struct Program Program;
 
 /**
  * Node types for the Abstract Syntax Tree (AST).
  */
 
-enum ExpressionType {
-	ADDITION,
-	DIVISION,
-	FACTOR,
-	MULTIPLICATION,
-	SUBTRACTION
+enum BinaryFormulaType
+{
+	AND_TYPE,
+	OR_TYPE,
+	IMPLY_TYPE
 };
 
-enum FactorType {
-	CONSTANT,
-	EXPRESSION
+enum UnaryFormulaType
+{
+	NEG_TYPE,
+	NOTHING
 };
 
-struct Constant {
-	int value;
+enum FormulaType
+{
+	BINARY,
+	UNARY,
+	VARIABLE_TYPE
 };
 
-struct Factor {
-	union {
-		Constant * constant;
-		Expression * expression;
-	};
-	FactorType type;
+struct Variable
+{
+	char * variable;
 };
 
-struct Expression {
-	union {
-		Factor * factor;
+struct Formula
+{
+	union
+	{
+		struct
+		{
+			Formula *leftFormula;
+			Formula *rightFormula;
+			BinaryFormulaType binaryFormulaType;
+		};
 		struct {
-			Expression * leftExpression;
-			Expression * rightExpression;
+			Formula * formula;
+			UnaryFormulaType unaryFormulaType;
+		};
+		struct {
+			Variable * variable;
 		};
 	};
-	ExpressionType type;
+	FormulaType formulaType;
 };
 
-struct Program {
-	Expression * expression;
+struct Program
+{
+	Formula *formula;
 };
 
 /**
  * Node recursive super-duper-trambolik-destructors.
  */
 
-void destroyConstant(Constant * constant);
-void destroyExpression(Expression * expression);
-void destroyFactor(Factor * factor);
-void destroyProgram(Program * program);
+void destroyFormula(Formula *formula);
+void destroyVariable(Variable *variable);
+
+void destroyProgram(Program *program);
 
 #endif

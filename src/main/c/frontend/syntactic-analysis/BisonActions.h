@@ -16,11 +16,11 @@ ModuleDestructor initializeBisonActionsModule();
  * Bison semantic actions.
  */
 
-Constant * IntegerConstantSemanticAction(const int value);
-Expression * ArithmeticExpressionSemanticAction(Expression * leftExpression, Expression * rightExpression, ExpressionType type);
-Expression * FactorExpressionSemanticAction(Factor * factor);
-Factor * ConstantFactorSemanticAction(Constant * constant);
-Factor * ExpressionFactorSemanticAction(Expression * expression);
-Program * ExpressionProgramSemanticAction(Expression * expression);
+Program * FormulaProgramSemanticAction(Formula * formula);
+
+Formula * BinaryFormulaSemanticAction(Formula * leftFormula, Formula * rightFormula, BinaryFormulaType formulaType);
+Formula * UnaryFormulaSemanticAction(Formula * formula, UnaryFormulaType formulaType);
+Formula * VariableFormulaSemanticAction(Variable * variable);
+Variable * StringVariableSemanticAction(const char* variable);
 
 #endif
