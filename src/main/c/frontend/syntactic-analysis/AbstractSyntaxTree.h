@@ -17,10 +17,14 @@ ModuleDestructor initializeAbstractSyntaxTreeModule();
 typedef enum BinaryFormulaType BinaryFormulaType;
 typedef enum UnaryFormulaType UnaryFormulaType;
 typedef enum FormulaType FormulaType;
+typedef enum DefinitionType DefinitionType;
+typedef enum ExpressionType ExpressionType;
 
 typedef struct Variable Variable;
 typedef struct Formula Formula;
-typedef struct FormulaList FormulaList;
+typedef struct Definition Definition;
+typedef struct Expression Expression;
+typedef struct ExpressionList ExpressionList;
 typedef struct Program Program;
 
 /**
@@ -47,10 +51,21 @@ enum FormulaType
 	VAR_FORMULA
 };
 
+enum DefinitionType
+{
+	VAR_DEF,
+	FORM_DEF
+};
+
+enum ExpressionType
+{
+	DEF_EXPR,
+	FORM_EXPR
+};
+
 struct Variable
 {
-	char *variable;
-	// bool value;
+	char *name;
 };
 
 struct Formula
@@ -76,15 +91,43 @@ struct Formula
 	FormulaType formulaType;
 };
 
-struct FormulaList
+struct Definition
 {
-	Formula *formula;
-	FormulaList *next;
+	union
+	{
+		struct
+		{
+			Variable *variable;
+			bool value;
+		};
+		struct
+		{
+			Formula *formula;
+			char *name;
+		};
+	};
+	DefinitionType definitionType;
+};
+
+struct Expression
+{
+	union
+	{
+		Definition *definition;
+		Formula *formula;
+	};
+	ExpressionType expressionType;
+};
+
+struct ExpressionList
+{
+	Expression *expression;
+	ExpressionList *next;
 };
 
 struct Program
 {
-	FormulaList *formulaList;
+	ExpressionList *expressionList;
 };
 
 /**
@@ -93,7 +136,9 @@ struct Program
 
 void destroyVariable(Variable *variable);
 void destroyFormula(Formula *formula);
-void destroyFormulaList(FormulaList *formulaList);
+void destroyDefinition(Definition *definition);
+void destroyExpression(Expression *expression);
+void destroyExpressionList(ExpressionList *expressionList);
 void destroyProgram(Program *program);
 
 #endif

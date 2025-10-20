@@ -40,12 +40,11 @@ static void _logSyntacticAnalyzerAction(const char *functionName)
 
 /* PUBLIC FUNCTIONS */
 
-Variable *StringVariableSemanticAction(const char *variable /*, bool value*/)
+Variable *StringVariableSemanticAction(const char *name)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Variable *newVariable = calloc(1, sizeof(Variable));
-	newVariable->variable = strdup(variable);
-	// newVariable->value = value;
+	newVariable->name = strdup(name);
 	return newVariable;
 }
 
@@ -75,25 +74,62 @@ Formula *UnaryFormulaSemanticAction(Formula *formula, UnaryFormulaType formulaTy
 	Formula *newFormula = calloc(1, sizeof(Formula));
 	newFormula->formula = formula;
 	newFormula->unaryFormulaType = formulaType;
-	formula->formulaType = UNARY;
+	newFormula->formulaType = UNARY;
 	return newFormula;
 }
 
-FormulaList *FormulaFormulaListSemanticAction(Formula *formula, FormulaList *formulaList)
+Definition *VariableDefinitionSemanticAction(Variable *variable, bool value)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	FormulaList *newFormulaList = calloc(1, sizeof(FormulaList));
-	newFormulaList->formula = formula;
-	newFormulaList->next = formulaList;
-	_compilerState->abstractSyntaxtTree = newFormulaList;
-	return newFormulaList;
+	Definition *definition = calloc(1, sizeof(Definition));
+	definition->variable = variable;
+	definition->value = value;
+	definition->definitionType = VAR_DEF;
+	return definition;
 }
 
-Program *FormulaListProgramSemanticAction(FormulaList *formulaList)
+Definition *FormulaDefinitionSemanticAction(Formula *formula, const char *name)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Definition *definition = calloc(1, sizeof(Definition));
+	definition->formula = formula;
+	definition->name = strdup(name);
+	definition->definitionType = FORM_DEF;
+	return definition;
+}
+
+Expression *DefinitionExpressionSemanticAction(Definition *definition)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Expression *expression = calloc(1, sizeof(Expression));
+	expression->definition = definition;
+	expression->expressionType = DEF_EXPR;
+	return expression;
+}
+
+Expression *FormulaExpressionSemanticAction(Formula *formula)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Expression *expression = calloc(1, sizeof(Expression));
+	expression->formula = formula;
+	expression->expressionType = FORM_EXPR;
+	return expression;
+}
+
+ExpressionList *ExpressionListSemanticAction(Expression *expression, ExpressionList *expressionList)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	ExpressionList *newExpressionList = calloc(1, sizeof(ExpressionList));
+	newExpressionList->expression = expression;
+	newExpressionList->next = expressionList;
+	return newExpressionList;
+}
+
+Program *ExpressionListProgramSemanticAction(ExpressionList *expressionList)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program *program = calloc(1, sizeof(Program));
-	program->formulaList = formulaList;
+	program->expressionList = expressionList;
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }

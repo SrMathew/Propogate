@@ -197,3 +197,23 @@ extern CompilationStatus FormulaLexemeAction(TokenLabel label)
 	destroyToken(token);
 	return status;
 }
+
+extern CompilationStatus TrueLexemeAction()
+{
+	Token *token = createToken(_lexicalAnalyzer, VALUE);
+	token->semanticValue->value = 1;
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	return status;
+}
+
+extern CompilationStatus FalseLexemeAction()
+{
+	Token *token = createToken(_lexicalAnalyzer, VALUE);
+	token->semanticValue->value = 0;
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	return status;
+}

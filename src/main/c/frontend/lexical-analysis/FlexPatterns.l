@@ -29,10 +29,12 @@ extern CompilationStatus SeparatorLexemeAction();
 extern CompilationStatus EqualsLexemeAction();
 
 extern CompilationStatus BinaryOperatorLexemeAction(TokenLabel label);
-extern CompilationStatus UnaryOperatorLexemeAction(TokenLabel label);          //TODO: label?
+extern CompilationStatus UnaryOperatorLexemeAction(TokenLabel label);
 
-extern CompilationStatus DefineOperatorLexemeAction();  //TODO: label?
 extern CompilationStatus FormulaLexemeAction(TokenLabel label);
+
+extern CompilationStatus TrueLexemeAction();
+extern CompilationStatus FalseLexemeAction();
 %}
 
 /**
@@ -77,34 +79,37 @@ whitespace			[[:space:]]+
 
 <PROPOGATE>"="                      { return EqualsLexemeAction(); }
 
-<PROPOGATE>[a-z]+                   { return FormulaLexemeAction(VAR_SYMBOL); }
+<PROPOGATE>[a-z]+                   { return FormulaLexemeAction(VAR_NAME); }
 
-<PROPOGATE>"\\alpha"                { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\beta"                 { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\chi"                  { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\delta"                { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\epsilon"              { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\eta"                  { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\gamma"                { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\iota"                 { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\alpha"                { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\beta"                 { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\chi"                  { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\delta"                { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\epsilon"              { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\eta"                  { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\gamma"                { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\iota"                 { return FormulaLexemeAction(FORM_NAME); }
 
-<PROPOGATE>"\\kappa"                { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\lambda"               { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\mu"                   { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\nu"                   { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\kappa"                { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\lambda"               { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\mu"                   { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\nu"                   { return FormulaLexemeAction(FORM_NAME); }
 
-<PROPOGATE>"\\omega"                { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\phi"                  { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\pi"                   { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\omega"                { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\phi"                  { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\pi"                   { return FormulaLexemeAction(FORM_NAME); }
 
-<PROPOGATE>"\\psi"                  { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\rho"                  { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\sigma"                { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\tau"                  { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\theta"                { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\upsilon"              { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\xi"                   { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\zeta"                 { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\psi"                  { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\rho"                  { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\sigma"                { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\tau"                  { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\theta"                { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\upsilon"              { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\xi"                   { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>"\\zeta"                 { return FormulaLexemeAction(FORM_NAME); }
+
+<PROPOGATE>"TRUE"                   { return TrueLexemeAction(); }
+<PROPOGATE>"FALSE"                  { return FalseLexemeAction(); }
 
 <PROPOGATE>"("						{ return ParenthesisLexemeAction(OPEN_PARENTHESIS); }
 <PROPOGATE>")"                      { return ParenthesisLexemeAction(CLOSE_PARENTHESIS); }

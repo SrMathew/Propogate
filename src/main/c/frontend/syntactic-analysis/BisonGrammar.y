@@ -25,14 +25,18 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 %union {
 	/** Terminals. */
+
 	char* str;
+	bool value;
 	TokenLabel token;
 
 	/** Non-terminals. */
 
 	Variable * variable;
 	Formula * formula;
-	FormulaList * formulaList;
+	Definition * definition;
+	Expression * expression;
+	ExpressionList * expressionList;
 	Program * program;
 }
 
@@ -47,11 +51,15 @@ void yyerror(const YYLTYPE * location, const char * message) {}
  
 %destructor { destroyVariable($$); } <variable>
 %destructor { destroyFormula($$); } <formula>
-%destructor { destroyFormulaList($$); } <formulaList>
+%destructor { destroyDefinition($$); } <definition>
+%destructor { destroyExpression($$); } <expression>
+%destructor { destroyExpressionList($$); } <expressionList>
 
 /** Terminals. */
-%token <str> VAR_SYMBOL
-%token <str> FORM_SYMBOL
+%token <str> VAR_NAME
+%token <str> FORM_NAME
+
+%token <value> VALUE
 
 %token <token> AND
 %token <token> OR
@@ -71,7 +79,9 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 /** Non-terminals. */
 %type <variable> variable
 %type <formula> formula
-%type <formulaList> formulaList
+%type <definition> definition
+%type <expression> expression
+%type <expressionList> expressionList
 %type <program> program
 
 // TODO define precedence and associativity
@@ -86,30 +96,37 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %%
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
-program: formulaList															{ $$ = FormulaListProgramSemanticAction($1); }
+program: expressionList															{ $$ = ExpressionListProgramSemanticAction($1); }
 	;
 
-formulaList: formulaList SEPARATOR formula										{ $$ = FormulaFormulaListSemanticAction($3, $1); }
-	| formula																	{ $$ = FormulaFormulaListSemanticAction($1, NULL); }
-//	| %empty																	{ $$ = NULL; }
+expressionList: expressionList SEPARATOR expression								{ $$ = ExpressionListSemanticAction($3, $1); }
+	| expression																{ $$ = ExpressionListSemanticAction($1, NULL); }
+	| %empty																	{ $$ = NULL; }
 	;
 
-formula: // NEG OPEN_PARENTHESIS formula[left] OR formula[right] AND OPEN_PARENTHESIS NEG OPEN_PARENTHESIS formula[left] AND formula[right] { $$ = BinaryFormulaSemanticAction($left, $right, XNOR); }
-//	| OPEN_PARENTHESIS formula[left] OR formula[right] AND OPEN_PARENTHESIS NEG OPEN_PARENTHESIS formula[left] AND formula[right] { $$ = BinaryFormulaSemanticAction($left, $right, XOR)}
-//	| NEG OPEN_PARENTHESIS formula[left] OR formula[right] CLOSE_PARENTHESIS 		{ $$ = BinaryFormulaSemanticAction($left, $right, NOR); }
-	/*|*/ OPEN_PARENTHESIS formula[left] OR formula[right] CLOSE_PARENTHESIS 		{ $$ = BinaryFormulaSemanticAction($left, $right, OR_TYPE); }
-//	| NEG OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS	{ $$ = BinaryFormulaSemanticAction($left, $right, NAND); }
-	| OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS	{ $$ = BinaryFormulaSemanticAction($left, $right, AND_TYPE); }
+expression: definition															{ $$ = DefinitionExpressionSemanticAction($1); }
+	| formula																	{ $$ = FormulaExpressionSemanticAction($1); }
+	;
+
+definition: variable EQUALS VALUE												{ $$ = VariableDefinitionSemanticAction($1, $3);}
+	| FORM_NAME EQUALS formula													{ $$ = FormulaDefinitionSemanticAction($3, $1);}
+	;
+
+/*
+NEG OPEN_PARENTHESIS formula[left] OR formula[right] AND OPEN_PARENTHESIS NEG OPEN_PARENTHESIS formula[left] AND formula[right] { $$ = BinaryFormulaSemanticAction($left, $right, XNOR); }
+OPEN_PARENTHESIS formula[left] OR formula[right] AND OPEN_PARENTHESIS NEG OPEN_PARENTHESIS formula[left] AND formula[right] { $$ = BinaryFormulaSemanticAction($left, $right, XOR)}
+NEG OPEN_PARENTHESIS formula[left] OR formula[right] CLOSE_PARENTHESIS 		{ $$ = BinaryFormulaSemanticAction($left, $right, NOR); }
+NEG OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS	{ $$ = BinaryFormulaSemanticAction($left, $right, NAND); }
+*/
+
+formula: OPEN_PARENTHESIS formula[left] OR formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, OR_TYPE); }
+	| OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, AND_TYPE); }
 	| OPEN_PARENTHESIS formula[left] IMPLY formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, IMPLY_TYPE); }
 	| NEG OPEN_PARENTHESIS formula CLOSE_PARENTHESIS							{ $$ = UnaryFormulaSemanticAction($3, NEG_TYPE); }
 	| OPEN_PARENTHESIS formula CLOSE_PARENTHESIS								{ $$ = UnaryFormulaSemanticAction($2, NOTHING); }
-//	| formula SEPARATOR															{ $$ = NULL; }
-//	| formula																	{ $$ = UnaryFormulaSemanticAction($1, NOTHING); } //TODO: commented because of r/r
-//	| NEG variable																//TODO: abuso de notacion, pero deberia ser valido
 	| variable																	{ $$ = VariableFormulaSemanticAction($1); }
-	//form_symbol?
 	;
 
-variable: VAR_SYMBOL																{ $$ = StringVariableSemanticAction($1); }
+variable: VAR_NAME																{ $$ = StringVariableSemanticAction($1); }
 	;
 %%

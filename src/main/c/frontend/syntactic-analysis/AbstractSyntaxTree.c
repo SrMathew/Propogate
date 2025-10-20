@@ -28,7 +28,7 @@ void destroyVariable(Variable *variable)
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (variable != NULL)
 	{
-		free(variable->variable);
+		free(variable->name);
 		free(variable);
 	}
 }
@@ -41,31 +41,93 @@ void destroyFormula(Formula *formula)
 		switch (formula->formulaType)
 		{
 		case BINARY:
-			destroyFormula(formula->leftFormula);
-			destroyFormula(formula->rightFormula);
+			if (formula->leftFormula != NULL)
+			{
+				destroyFormula(formula->leftFormula);
+			}
+			if (formula->rightFormula != NULL)
+			{
+				destroyFormula(formula->rightFormula);
+			}
 			break;
 		case UNARY:
-			destroyFormula(formula->formula);
+			if (formula->formula != NULL)
+			{
+				destroyFormula(formula->formula);
+			}
 			break;
 		case VAR_FORMULA:
-			destroyVariable(formula->variable);
+			if (formula->variable != NULL)
+			{
+				destroyVariable(formula->variable);
+			}
 			break;
 		}
 		free(formula);
 	}
 }
 
-void destroyFormulaList(FormulaList *formulaList)
+void destroyDefinition(Definition *definition)
 {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-	if (formulaList != NULL)
+	if (definition != NULL)
 	{
-		if (formulaList->next != NULL)
+		switch (definition->definitionType)
 		{
-			destroyFormulaList(formulaList->next);
+		case VAR_DEF:
+			if (definition->variable != NULL)
+			{
+				destroyVariable(definition->variable);
+			}
+			break;
+		case FORM_DEF:
+			if (definition->formula != NULL)
+			{
+				free(definition->name);
+				destroyFormula(definition->formula);
+				//free(definition->name);
+			}
+			break;
 		}
-		destroyFormula(formulaList->formula);
-		free(formulaList);
+		free(definition);
+	}
+}
+
+void destroyExpression(Expression *expression)
+{
+	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+	if (expression != NULL)
+	{
+		switch (expression->expressionType)
+		{
+		case DEF_EXPR:
+			if (expression->definition != NULL)
+			{
+				destroyDefinition(expression->definition);
+			}
+			break;
+		case FORM_EXPR:
+			if (expression->formula != NULL)
+			{
+				destroyFormula(expression->formula);
+			}
+			break;
+		}
+		free(expression);
+	}
+}
+
+void destroyExpressionList(ExpressionList *expressionList)
+{
+	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+	if (expressionList != NULL)
+	{
+		if (expressionList->next != NULL)
+		{
+			destroyExpressionList(expressionList->next);
+		}
+		destroyExpression(expressionList->expression);
+		free(expressionList);
 	}
 }
 
@@ -74,7 +136,7 @@ void destroyProgram(Program *program)
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (program != NULL)
 	{
-		destroyFormulaList(program->formulaList);
+		destroyExpressionList(program->expressionList);
 		free(program);
 	}
 }
