@@ -20,7 +20,7 @@ typedef enum FormulaType FormulaType;
 
 typedef struct Variable Variable;
 typedef struct Formula Formula;
-
+typedef struct FormulaList FormulaList;
 typedef struct Program Program;
 
 /**
@@ -49,7 +49,8 @@ enum FormulaType
 
 struct Variable
 {
-	char * variable;
+	char *variable;
+	// bool value;
 };
 
 struct Formula
@@ -62,29 +63,37 @@ struct Formula
 			Formula *rightFormula;
 			BinaryFormulaType binaryFormulaType;
 		};
-		struct {
-			Formula * formula;
+		struct
+		{
+			Formula *formula;
 			UnaryFormulaType unaryFormulaType;
 		};
-		struct {
-			Variable * variable;
+		struct
+		{
+			Variable *variable;
 		};
 	};
 	FormulaType formulaType;
 };
 
-struct Program
+struct FormulaList
 {
 	Formula *formula;
+	FormulaList *next;
+};
+
+struct Program
+{
+	FormulaList *formulaList;
 };
 
 /**
  * Node recursive super-duper-trambolik-destructors.
  */
 
-void destroyFormula(Formula *formula);
 void destroyVariable(Variable *variable);
-
+void destroyFormula(Formula *formula);
+void destroyFormulaList(FormulaList *formulaList);
 void destroyProgram(Program *program);
 
 #endif

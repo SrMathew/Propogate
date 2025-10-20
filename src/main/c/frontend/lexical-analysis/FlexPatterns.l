@@ -18,7 +18,6 @@
 extern CompilationStatus EOFLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
 extern CompilationStatus ParenthesisLexemeAction(TokenLabel label);
-//extern CompilationStatus SubexpressionLexemeAction();
 extern CompilationStatus UnknownLexemeAction();
 
 extern CompilationStatus EnterLaTeXMathModeLexemeAction(FlexContext context);
@@ -26,12 +25,14 @@ extern CompilationStatus LeaveLaTeXMathModeLexemeAction();
 extern CompilationStatus EnterPropogateLexemeAction(FlexContext context);
 extern CompilationStatus LeavePropogateLexemeAction();
 
+extern CompilationStatus SeparatorLexemeAction();
+extern CompilationStatus EqualsLexemeAction();
+
 extern CompilationStatus BinaryOperatorLexemeAction(TokenLabel label);
 extern CompilationStatus UnaryOperatorLexemeAction(TokenLabel label);          //TODO: label?
 
 extern CompilationStatus DefineOperatorLexemeAction();  //TODO: label?
 extern CompilationStatus FormulaLexemeAction(TokenLabel label);
-
 %}
 
 /**
@@ -74,7 +75,7 @@ whitespace			[[:space:]]+
 
 <PROPOGATE>"\\neg"                  { return UnaryOperatorLexemeAction(NEG); }
 
-<PROPOGATE>"="                      { return DefineOperatorLexemeAction(); }
+<PROPOGATE>"="                      { return EqualsLexemeAction(); }
 
 <PROPOGATE>[a-z]+                   { return FormulaLexemeAction(VAR_SYMBOL); }
 
@@ -108,7 +109,7 @@ whitespace			[[:space:]]+
 <PROPOGATE>"("						{ return ParenthesisLexemeAction(OPEN_PARENTHESIS); }
 <PROPOGATE>")"                      { return ParenthesisLexemeAction(CLOSE_PARENTHESIS); }
 
-<PROPOGATE>","                      { return IgnoredLexemeAction(); }
+<PROPOGATE>","                      { return SeparatorLexemeAction(); }
 <PROPOGATE>"\n"                     { return IgnoredLexemeAction(); }
 
 <PROPOGATE>"}"                      { return LeavePropogateLexemeAction(); }

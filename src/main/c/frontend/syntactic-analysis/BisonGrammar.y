@@ -30,8 +30,9 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 	/** Non-terminals. */
 
-	Formula * formula;
 	Variable * variable;
+	Formula * formula;
+	FormulaList * formulaList;
 	Program * program;
 }
 
@@ -43,8 +44,10 @@ void yyerror(const YYLTYPE * location, const char * message) {}
  *
  * @see https://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
  */
-%destructor { destroyFormula($$); } <formula>
+ 
 %destructor { destroyVariable($$); } <variable>
+%destructor { destroyFormula($$); } <formula>
+%destructor { destroyFormulaList($$); } <formulaList>
 
 /** Terminals. */
 %token <str> VAR_SYMBOL
@@ -68,6 +71,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 /** Non-terminals. */
 %type <variable> variable
 %type <formula> formula
+%type <formulaList> formulaList
 %type <program> program
 
 // TODO define precedence and associativity
@@ -82,7 +86,12 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %%
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
-program: formula																{ $$ = FormulaProgramSemanticAction($1); }
+program: formulaList															{ $$ = FormulaListProgramSemanticAction($1); }
+	;
+
+formulaList: formulaList SEPARATOR formula										{ $$ = FormulaFormulaListSemanticAction($3, $1); }
+	| formula																	{ $$ = FormulaFormulaListSemanticAction($1, NULL); }
+//	| %empty																	{ $$ = NULL; }
 	;
 
 formula: // NEG OPEN_PARENTHESIS formula[left] OR formula[right] AND OPEN_PARENTHESIS NEG OPEN_PARENTHESIS formula[left] AND formula[right] { $$ = BinaryFormulaSemanticAction($left, $right, XNOR); }

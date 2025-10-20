@@ -2,12 +2,14 @@
 
 /* MODULE INTERNAL STATE */
 
-static CompilerState * _compilerState = NULL;
-static Logger * _logger = NULL;
+static CompilerState *_compilerState = NULL;
+static Logger *_logger = NULL;
 
 /** Shutdown module's internal state. */
-void _shutdownBisonActionsModule() {
-	if (_logger != NULL) {
+void _shutdownBisonActionsModule()
+{
+	if (_logger != NULL)
+	{
 		logDebugging(_logger, "Destroying module: BisonActions...");
 		destroyLogger(_logger);
 		_logger = NULL;
@@ -15,7 +17,8 @@ void _shutdownBisonActionsModule() {
 	_compilerState = NULL;
 }
 
-ModuleDestructor initializeBisonActionsModule(CompilerState * compilerState) {
+ModuleDestructor initializeBisonActionsModule(CompilerState *compilerState)
+{
 	_compilerState = compilerState;
 	_logger = createLogger("BisonActions");
 	return _shutdownBisonActionsModule;
@@ -25,27 +28,40 @@ ModuleDestructor initializeBisonActionsModule(CompilerState * compilerState) {
 
 /* PRIVATE FUNCTIONS */
 
-static void _logSyntacticAnalyzerAction(const char * functionName);
+static void _logSyntacticAnalyzerAction(const char *functionName);
 
 /**
  * Logs a syntactic-analyzer action in DEBUGGING level.
  */
-static void _logSyntacticAnalyzerAction(const char * functionName) {
+static void _logSyntacticAnalyzerAction(const char *functionName)
+{
 	logDebugging(_logger, "%s", functionName);
 }
 
 /* PUBLIC FUNCTIONS */
 
-Variable * StringVariableSemanticAction(const char* variable) {
+Variable *StringVariableSemanticAction(const char *variable /*, bool value*/)
+{
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Variable * newVariable = calloc(1, sizeof(Variable));
+	Variable *newVariable = calloc(1, sizeof(Variable));
 	newVariable->variable = strdup(variable);
+	// newVariable->value = value;
 	return newVariable;
 }
 
-Formula * BinaryFormulaSemanticAction(Formula * leftFormula, Formula * rightFormula, BinaryFormulaType formulaType) {
+Formula *VariableFormulaSemanticAction(Variable *variable)
+{
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Formula * formula = calloc(1, sizeof(Formula));
+	Formula *formula = calloc(1, sizeof(Formula));
+	formula->variable = variable;
+	formula->formulaType = VAR_FORMULA;
+	return formula;
+}
+
+Formula *BinaryFormulaSemanticAction(Formula *leftFormula, Formula *rightFormula, BinaryFormulaType formulaType)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Formula *formula = calloc(1, sizeof(Formula));
 	formula->leftFormula = leftFormula;
 	formula->rightFormula = rightFormula;
 	formula->binaryFormulaType = formulaType;
@@ -53,27 +69,31 @@ Formula * BinaryFormulaSemanticAction(Formula * leftFormula, Formula * rightForm
 	return formula;
 }
 
-Formula * UnaryFormulaSemanticAction(Formula * formula, UnaryFormulaType formulaType) {
+Formula *UnaryFormulaSemanticAction(Formula *formula, UnaryFormulaType formulaType)
+{
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Formula * newFormula = calloc(1, sizeof(Formula));
+	Formula *newFormula = calloc(1, sizeof(Formula));
 	newFormula->formula = formula;
 	newFormula->unaryFormulaType = formulaType;
 	formula->formulaType = UNARY;
 	return newFormula;
 }
 
-Formula * VariableFormulaSemanticAction(Variable * variable) {
+FormulaList *FormulaFormulaListSemanticAction(Formula *formula, FormulaList *formulaList)
+{
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Formula * formula = calloc(1, sizeof(Formula));
-	formula->variable = variable;
-	formula->formulaType = VAR_FORMULA;
-	return formula;
+	FormulaList *newFormulaList = calloc(1, sizeof(FormulaList));
+	newFormulaList->formula = formula;
+	newFormulaList->next = formulaList;
+	_compilerState->abstractSyntaxtTree = newFormulaList;
+	return newFormulaList;
 }
 
-Program * FormulaProgramSemanticAction(Formula * formula) {
+Program *FormulaListProgramSemanticAction(FormulaList *formulaList)
+{
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Program * program = calloc(1, sizeof(Program));
-	program->formula = formula;
+	Program *program = calloc(1, sizeof(Program));
+	program->formulaList = formulaList;
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }
