@@ -26,14 +26,10 @@ extern CompilationStatus LeaveLaTeXMathModeLexemeAction();
 extern CompilationStatus EnterPropogateLexemeAction(FlexContext context);
 extern CompilationStatus LeavePropogateLexemeAction();
 
-extern CompilationStatus DefineFormulaLexemeAction(TokenLabel label);
-extern CompilationStatus DefineVariableLexemeAction(TokenLabel label);
-
 extern CompilationStatus BinaryOperatorLexemeAction(TokenLabel label);
 extern CompilationStatus UnaryOperatorLexemeAction(TokenLabel label);          //TODO: label?
 
 extern CompilationStatus DefineOperatorLexemeAction();  //TODO: label?
-//extern CompilationStatus VariableLexemeAction();
 extern CompilationStatus FormulaLexemeAction(TokenLabel label);
 
 %}
@@ -63,79 +59,69 @@ whitespace			[[:space:]]+
 
 %}
 
-%{
-//"{"									{ return EnterImportExpressionLexemeAction(IMPORT_EXPRESSION); }
-//<IMPORT_EXPRESSION>[^{}]+			{ return SubexpressionLexemeAction(); }
-//<IMPORT_EXPRESSION>"}"				{ return LeaveImportExpressionLexemeAction(); }
-//<IMPORT_EXPRESSION>.				{ return UnknownLexemeAction(); }
-
-// TODO recycle the below comments actions and ...symbols? (check for LaTex equivalent)
-//"/*"								{ return EnterMultilineCommentLexemeAction(MULTILINE_COMMENT); }
-//<MULTILINE_COMMENT>"*/"				{ return LeaveMultilineCommentLexemeAction(); }
-//<MULTILINE_COMMENT>[^*]+			{ return IgnoredLexemeAction(); }
-//<MULTILINE_COMMENT>.				{ return IgnoredLexemeAction(); }
-%}
-
-"\\("                                { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+"\\("                               { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
 "$"                                 { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-"\\begin{math}"                      { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-"\\["                                { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-"\\begin{displaymath}"               { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-"\\begin{equation}"                  { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+"\\begin{math}"                     { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+"\\["                               { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+"\\begin{displaymath}"              { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+"\\begin{equation}"                 { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
 
-<MATHMODE>"\\propogate{"             { return EnterPropogateLexemeAction(PROPOGATE); }
+<MATHMODE>"\\propogate{"            { return EnterPropogateLexemeAction(PROPOGATE); }
 
-<PROPOGATE>"\\wedge"                 { return BinaryOperatorLexemeAction(AND); }
-<PROPOGATE>"\\vee"                   { return BinaryOperatorLexemeAction(OR); }
-<PROPOGATE>"\\rightarrow"            { return BinaryOperatorLexemeAction(IMPLY); }
+<PROPOGATE>"\\wedge"                { return BinaryOperatorLexemeAction(AND); }
+<PROPOGATE>"\\vee"                  { return BinaryOperatorLexemeAction(OR); }
+<PROPOGATE>"\\rightarrow"           { return BinaryOperatorLexemeAction(IMPLY); }
 
-<PROPOGATE>"\\neg"                   { return UnaryOperatorLexemeAction(NEG); }
+<PROPOGATE>"\\neg"                  { return UnaryOperatorLexemeAction(NEG); }
 
 <PROPOGATE>"="                      { return DefineOperatorLexemeAction(); }
 
 <PROPOGATE>[a-z]+                   { return FormulaLexemeAction(VAR_SYMBOL); }
 
-<PROPOGATE>"\\alpha"                 { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\beta"                  { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\chi"                   { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\delta"                 { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\epsilon"               { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\eta"                   { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\gamma"                 { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\iota"                  { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\alpha"                { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\beta"                 { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\chi"                  { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\delta"                { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\epsilon"              { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\eta"                  { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\gamma"                { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\iota"                 { return FormulaLexemeAction(FORM_SYMBOL); }
 
-<PROPOGATE>"\\kappa"                 { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\lambda"                { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\mu"                    { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\nu"                    { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\kappa"                { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\lambda"               { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\mu"                   { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\nu"                   { return FormulaLexemeAction(FORM_SYMBOL); }
 
-<PROPOGATE>"\\omega"                 { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\phi"                   { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\pi"                    { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\omega"                { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\phi"                  { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\pi"                   { return FormulaLexemeAction(FORM_SYMBOL); }
 
-<PROPOGATE>"\\psi"                   { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\rho"                   { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\sigma"                 { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\tau"                   { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\theta"                 { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\upsilon"               { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\xi"                    { return FormulaLexemeAction(FORM_SYMBOL); }
-<PROPOGATE>"\\zeta"                  { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\psi"                  { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\rho"                  { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\sigma"                { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\tau"                  { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\theta"                { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\upsilon"              { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\xi"                   { return FormulaLexemeAction(FORM_SYMBOL); }
+<PROPOGATE>"\\zeta"                 { return FormulaLexemeAction(FORM_SYMBOL); }
 
 <PROPOGATE>"("						{ return ParenthesisLexemeAction(OPEN_PARENTHESIS); }
 <PROPOGATE>")"                      { return ParenthesisLexemeAction(CLOSE_PARENTHESIS); }
+
+<PROPOGATE>","                      { return IgnoredLexemeAction(); }
+<PROPOGATE>"\n"                     { return IgnoredLexemeAction(); }
 
 <PROPOGATE>"}"                      { return LeavePropogateLexemeAction(); }
 
 <PROPOGATE>{whitespace}             { return IgnoredLexemeAction(); }
 <PROPOGATE>.                        { return UnknownLexemeAction(); }
 
-<MATHMODE>"\\)"                      { return LeaveLaTeXMathModeLexemeAction(); }
+<MATHMODE>"\\)"                     { return LeaveLaTeXMathModeLexemeAction(); }
 <MATHMODE>"$"                       { return LeaveLaTeXMathModeLexemeAction(); }
-<MATHMODE>"\\end{math}"              { return LeaveLaTeXMathModeLexemeAction(); }
-<MATHMODE>"\\]"                      { return LeaveLaTeXMathModeLexemeAction(); }
-<MATHMODE>"\\end{displaymath}"       { return LeaveLaTeXMathModeLexemeAction(); }
-<MATHMODE>"\\end{equation}"          { return LeaveLaTeXMathModeLexemeAction(); }
+<MATHMODE>"\\end{math}"             { return LeaveLaTeXMathModeLexemeAction(); }
+<MATHMODE>"\\]"                     { return LeaveLaTeXMathModeLexemeAction(); }
+<MATHMODE>"\\end{displaymath}"      { return LeaveLaTeXMathModeLexemeAction(); }
+<MATHMODE>"\\end{equation}"         { return LeaveLaTeXMathModeLexemeAction(); }
 
 <MATHMODE>.                         { return IgnoredLexemeAction(); }
 
