@@ -40,7 +40,7 @@ static void _logSyntacticAnalyzerAction(const char *functionName)
 
 /* PUBLIC FUNCTIONS */
 
-Variable *StringVariableSemanticAction(const char *name)
+Variable *StringVariableSemanticAction(char *name)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	if (!name) logError(_logger, "StringVariableSemanticAction: name is NULL");
@@ -90,7 +90,7 @@ Definition *VariableDefinitionSemanticAction(Variable *variable, bool value)
 	return definition;
 }
 
-Definition *FormulaDefinitionSemanticAction(Formula *formula, const char *name)
+Definition *FormulaDefinitionSemanticAction(Formula *formula, char *name)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	if (!name) logError(_logger, "StringVariableSemanticAction: name is NULL");
