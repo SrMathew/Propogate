@@ -1,1 +1,5 @@
+\documentclass{article}
+\begin{document}
+\newcommand{\propogate}[1]{#1}
 $\propogate{\neg(p)}$
+\end{document}
