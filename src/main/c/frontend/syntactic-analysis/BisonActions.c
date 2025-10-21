@@ -43,8 +43,10 @@ static void _logSyntacticAnalyzerAction(const char *functionName)
 Variable *StringVariableSemanticAction(const char *name)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
+	if (!name) logError(_logger, "StringVariableSemanticAction: name is NULL");
+    else logDebugging(_logger, "StringVariableSemanticAction: name='%s'", name);
 	Variable *newVariable = calloc(1, sizeof(Variable));
-	newVariable->name = strdup(name);
+	newVariable->name = name;
 	return newVariable;
 }
 
@@ -91,9 +93,11 @@ Definition *VariableDefinitionSemanticAction(Variable *variable, bool value)
 Definition *FormulaDefinitionSemanticAction(Formula *formula, const char *name)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
+	if (!name) logError(_logger, "StringVariableSemanticAction: name is NULL");
+    else logDebugging(_logger, "StringVariableSemanticAction: name='%s'", name);
 	Definition *definition = calloc(1, sizeof(Definition));
 	definition->formula = formula;
-	definition->name = strdup(name);
+	definition->name = name;
 	definition->definitionType = FORM_DEF;
 	return definition;
 }
