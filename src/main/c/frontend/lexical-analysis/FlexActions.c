@@ -104,6 +104,30 @@ CompilationStatus UnknownLexemeAction()
 	return FAILED;
 }
 
+CompilationStatus EnterCommandDefinedLexemeAction(FlexContext context)
+{
+	if (_logIgnoredLexemes)
+	{
+		Token *token = createToken(_lexicalAnalyzer, IGNORED);
+		_logTokenAction(__FUNCTION__, token);
+		destroyToken(token);
+	}
+	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
+	return IN_PROGRESS;
+}
+
+CompilationStatus LeaveCommandDefinedLexemeAction()
+{
+	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
+	if (_logIgnoredLexemes)
+	{
+		Token *token = createToken(_lexicalAnalyzer, IGNORED);
+		_logTokenAction(__FUNCTION__, token);
+		destroyToken(token);
+	}
+	return IN_PROGRESS;
+}
+
 CompilationStatus EnterLaTeXMathModeLexemeAction(FlexContext context)
 {
 	if (_logIgnoredLexemes)

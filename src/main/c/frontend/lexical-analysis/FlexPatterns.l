@@ -20,6 +20,8 @@ extern CompilationStatus IgnoredLexemeAction();
 extern CompilationStatus ParenthesisLexemeAction(TokenLabel label);
 extern CompilationStatus UnknownLexemeAction();
 
+extern CompilationStatus EnterCommandDefinedLexemeAction(FlexContext context);
+extern CompilationStatus LeaveCommandDefinedLexemeAction();
 extern CompilationStatus EnterLaTeXMathModeLexemeAction(FlexContext context);
 extern CompilationStatus LeaveLaTeXMathModeLexemeAction();
 extern CompilationStatus EnterPropogateLexemeAction(FlexContext context);
@@ -42,6 +44,8 @@ extern CompilationStatus FalseLexemeAction();
  *
  * @see https://westes.github.io/flex/manual/Start-Conditions.html
  */
+
+%x DEFINED
 %x MATHMODE
 %x PROPOGATE
 
@@ -62,12 +66,14 @@ whitespace			[[:space:]]+
 
 %}
 
-"\\("                               { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-"$"                                 { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-"\\begin{math}"                     { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-"\\["                               { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-"\\begin{displaymath}"              { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-"\\begin{equation}"                 { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+"\\newcommand{\\propogate}[1]{#1}"    { return EnterCommandDefinedLexemeAction(DEFINED); }
+
+<DEFINED>"\\("                      { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+<DEFINED>"$"                        { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+<DEFINED>"\\begin{math}"            { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+<DEFINED>"\\["                      { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+<DEFINED>"\\begin{displaymath}"     { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
+<DEFINED>"\\begin{equation}"        { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
 
 <MATHMODE>"\\propogate{"            { return EnterPropogateLexemeAction(PROPOGATE); }
 
@@ -129,7 +135,27 @@ whitespace			[[:space:]]+
 <MATHMODE>"\\end{displaymath}"      { return LeaveLaTeXMathModeLexemeAction(); }
 <MATHMODE>"\\end{equation}"         { return LeaveLaTeXMathModeLexemeAction(); }
 
+%{
+    // Ignore everything else in Math mode
+%}
+<MATHMODE>[^(?!(?:\\\)|\$|\\end\{math\}|\\\]|\\end\{displaymath\}|\\end\{equation\})$).*$] { return IgnoredLexemeAction(); }
+
 <MATHMODE>.                         { return IgnoredLexemeAction(); }
+
+<DEFINED>"\\end{document}"          { return LeaveCommandDefinedLexemeAction(); }
+
+%{
+    // Ignore everything else in the document    
+%}
+
+<DEFINED>[^(?!(?:\\\(|\$|\\begin\{math\}|\\\[|\\begin\{displaymath\}|\\begin\{equation\}|\\end\{document\})$).*$] { return IgnoredLexemeAction(); }
+
+<DEFINED>.                          { return IgnoredLexemeAction(); }
+
+%{
+    // Ignore everything in the document if the command was not defined
+%}
+[^(?!\\newcommand\{\\propogate\}\[1\]\{#1\}$).*$] { return IgnoredLexemeAction(); }
 
 .									{ return IgnoredLexemeAction(); }
 
