@@ -215,7 +215,7 @@ CompilationStatus UnaryOperatorLexemeAction(TokenLabel label)
 extern CompilationStatus FormulaLexemeAction(TokenLabel label)
 {
 	Token *token = createToken(_lexicalAnalyzer, label);
-	token->semanticValue->str = strdup(token->lexeme);
+	token->semanticValue->string = strdup(token->lexeme);
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);
@@ -225,7 +225,7 @@ extern CompilationStatus FormulaLexemeAction(TokenLabel label)
 extern CompilationStatus TrueLexemeAction()
 {
 	Token *token = createToken(_lexicalAnalyzer, VALUE);
-	token->semanticValue->value = 1;
+	token->semanticValue->value = true;
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);
@@ -235,7 +235,7 @@ extern CompilationStatus TrueLexemeAction()
 extern CompilationStatus FalseLexemeAction()
 {
 	Token *token = createToken(_lexicalAnalyzer, VALUE);
-	token->semanticValue->value = 0;
+	token->semanticValue->value = false;
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);

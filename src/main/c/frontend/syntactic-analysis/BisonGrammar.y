@@ -26,7 +26,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %union {
 	/** Terminals. */
 
-	char* str;
+	char* string;
 	bool value;
 	TokenLabel token;
 
@@ -56,8 +56,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %destructor { destroyExpressionList($$); } <expressionList>
 
 /** Terminals. */
-%token <str> VAR_NAME
-%token <str> FORM_NAME
+%token <string> VAR_NAME
+%token <string> FORM_NAME
 
 %token <value> VALUE
 
@@ -119,8 +119,8 @@ NEG OPEN_PARENTHESIS formula[left] OR formula[right] CLOSE_PARENTHESIS 		{ $$ = 
 NEG OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS	{ $$ = BinaryFormulaSemanticAction($left, $right, NAND); }
 */
 
-formula: OPEN_PARENTHESIS formula[left] OR formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, OR_TYPE); }
-	| OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, AND_TYPE); }
+formula: OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS	{ $$ = BinaryFormulaSemanticAction($left, $right, AND_TYPE); }
+	| OPEN_PARENTHESIS formula[left] OR formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, OR_TYPE); }
 	| OPEN_PARENTHESIS formula[left] IMPLY formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, IMPLY_TYPE); }
 	| NEG OPEN_PARENTHESIS formula CLOSE_PARENTHESIS							{ $$ = UnaryFormulaSemanticAction($3, NEG_TYPE); }
 	| OPEN_PARENTHESIS formula CLOSE_PARENTHESIS								{ $$ = UnaryFormulaSemanticAction($2, NOTHING); }
