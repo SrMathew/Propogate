@@ -43,8 +43,8 @@ static void _logSyntacticAnalyzerAction(const char *functionName)
 Variable *StringVariableSemanticAction(char *name)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	if (!name) logError(_logger, strcat(": name is NULL", __FUNCTION__));
-    else logDebugging(_logger, strcat(": name='%s'", __FUNCTION__), name);
+	if (!name) logError(_logger, "%s: name is NULL", __FUNCTION__);
+    else logDebugging(_logger, "%s: name='%s'", __FUNCTION__, name);
 	Variable *newVariable = calloc(1, sizeof(Variable));
 	newVariable->name = name;
 	return newVariable;
