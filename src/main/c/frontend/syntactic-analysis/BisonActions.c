@@ -197,15 +197,17 @@ Element *MathEnvironmentElementSemanticAction(Math *math, char *environmentLeft,
 
 Element *ContentElementSemanticAction(Content *content, Text *environmentLeft, Text *environmentRight)
 {
+	// Uso dos Text porque tienen que coincidir, pero solo me guardo uno, por lo que destruyo el otro
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	if (strcmp(environmentLeft->text, environmentRight->text) == 0)
+	if (strcmp(environmentLeft->text, environmentRight->text) != 0)
 		logError(_logger, "%s: environments don't match", __FUNCTION__);
 	else
-		logDebugging(_logger, "%s: environment='%s'", __FUNCTION__, environmentLeft);
+		logDebugging(_logger, "%s: environment='%s'", __FUNCTION__, environmentLeft->text);
 	Element *element = calloc(1, sizeof(Element));
 	element->content = content;
 	element->environment = environmentLeft;
 	element->elementType = ENVIRONMENT;
+	destroyText(environmentRight);
 	return element;
 }
 

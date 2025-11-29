@@ -89,61 +89,14 @@ CompilationStatus IgnoredLexemeAction()
 
 /* LATEX FUNCTIONS */
 
-/*
-CompilationStatus EnterEnvironmentLexemeAction(FlexContext context)
-{
-	if (_logIgnoredLexemes)
-	{
-		Token *token = createToken(_lexicalAnalyzer, IGNORED);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
-	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
-	return IN_PROGRESS;
-}
-
-CompilationStatus LeaveEnvironmentLexemeAction()
-{
-	if (_logIgnoredLexemes)
-	{
-		Token *token = createToken(_lexicalAnalyzer, IGNORED);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
-	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
-	return IN_PROGRESS;
-}
-
-// Necesito un contexto Mathmode porque $ y $$ abren y cierran el mathmode indistinguiblemente
-CompilationStatus EnterMathmodeLexemeAction(FlexContext context, TokenLabel label)
+CompilationStatus NamedEnvironmentLexemeAction(TokenLabel label)
 {
 	Token *token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);
-	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
 	return status;
 }
-
-CompilationStatus LeaveMathmodeLexemeAction(TokenLabel label)
-{
-	Token *token = createToken(_lexicalAnalyzer, label);
-	_logTokenAction(__FUNCTION__, token);
-	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
-	destroyToken(token);
-	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
-	return status;
-}
-
-CompilationStatus MathmodeEnvironmentLexemeAction()
-{
-	Token *token = createToken(_lexicalAnalyzer, MM_ENVIRONMENT);
-	_logTokenAction(__FUNCTION__, token);
-	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
-	destroyToken(token);
-	return status;
-}
-*/
 
 CompilationStatus MathmodeEnvironmentLexemeAction(TokenLabel label)
 {

@@ -19,11 +19,7 @@ extern CompilationStatus EOFLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
 
 /* LATEX FUNCTIONS */
-// extern CompilationStatus EnterEnvironmentLexemeAction(FlexContext context);
-// extern CompilationStatus LeaveEnvironmentLexemeAction();
-// extern CompilationStatus EnterMathmodeLexemeAction(FlexContext context, TokenLabel label);
-// extern CompilationStatus LeaveMathmodeLexemeAction(TokenLabel label);
-// extern CompilationStatus MathmodeEnvironmentLexemeAction();
+extern CompilationStatus NamedEnvironmentLexemeAction(TokenLabel label);
 extern CompilationStatus MathmodeEnvironmentLexemeAction(TokenLabel label);
 extern CompilationStatus BracketLexemeAction(TokenLabel label);
 extern CompilationStatus EnterCommentLexemeAction(FlexContext context);
@@ -103,22 +99,19 @@ formula             \\[alpha|beta|chi|delta|epsilon|eta|gamma|iota|kappa|lambda|
 <PROPOGATE>{whitespace}             { return IgnoredLexemeAction(); }
 <PROPOGATE>.                        { return UnknownLexemeAction(); }
 
-%{/*"\\begin"                           { return EnterEnvironmentLexemeAction(ENVIRONMENT_DEF); }
-"\\end"                             { return LeaveEnvironmentLexemeAction(); }
-<ENVIRONMENT_DEF>"math"             { return MathmodeEnvironmentLexemeAction(); }
-<ENVIRONMENT_DEF>"displaymath"      { return MathmodeEnvironmentLexemeAction(); }
-<ENVIRONMENT_DEF>"equation"         { return MathmodeEnvironmentLexemeAction(); }
+"\\begin"                           { return NamedEnvironmentLexemeAction(BEGIN_ENVIRONMENT); }
+"\\end"                             { return NamedEnvironmentLexemeAction(END_ENVIRONMENT); }
 
-"\\("                               { return EnterMathmodeLexemeAction(MATHMODE, MM_OPEN_PARENTHESIS); }
-"\\["                               { return EnterMathmodeLexemeAction(MATHMODE, MM_OPEN_BRACKET); }
-"$"                                 { return EnterMathmodeLexemeAction(MATHMODE, MM_OPEN_DOLLAR); }
-"$$"                                { return EnterMathmodeLexemeAction(MATHMODE, MM_OPEN_DOUBLEDOLLAR); }
-<MATHMODE>"\\)"                     { return LeaveMathmodeLexemeAction(MM_CLOSE_PARENTHESIS); }
-<MATHMODE>"\\]"                     { return LeaveMathmodeLexemeAction(MM_CLOSE_BRACKET); }
-<MATHMODE>"$"                       { return LeaveMathmodeLexemeAction(MM_CLOSE_DOLLAR); }
-<MATHMODE>"$$"                      { return LeaveMathmodeLexemeAction(MM_CLOSE_DOUBLEDOLLAR); }*/%}
+"math"                              { return MathmodeEnvironmentLexemeAction(MM_ENVIRONMENT); }
+"displaymath"                       { return MathmodeEnvironmentLexemeAction(MM_ENVIRONMENT); }
+"equation"                          { return MathmodeEnvironmentLexemeAction(MM_ENVIRONMENT); }
 
+"$$"                                { return MathmodeEnvironmentLexemeAction(DDOLLAR); }
 "$"                                 { return MathmodeEnvironmentLexemeAction(DOLLAR); }
+"\\("                               { return MathmodeEnvironmentLexemeAction(MM_OPEN_PARENTHESIS); }
+"\\)"                               { return MathmodeEnvironmentLexemeAction(MM_CLOSE_PARENTHESIS); }
+"\\["                               { return MathmodeEnvironmentLexemeAction(MM_OPEN_BRACKET); }
+"\\]"                               { return MathmodeEnvironmentLexemeAction(MM_CLOSE_BRACKET); }
 
 "{"                                 { return BracketLexemeAction(OPEN_BRACE); }
 "}"                                 { return BracketLexemeAction(CLOSE_BRACE); }
