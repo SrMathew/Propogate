@@ -40,7 +40,7 @@ const int main(const int length, const char ** arguments) {
 		EvaluationResult valuationResult = executePropogate(&compilerState);
 		if (valuationResult.succeeded) {
 			compilerState.value = valuationResult.value;
-			//executeGenerator(&compilerState);
+			executeGenerator(&compilerState);
 		}
 		else {
 			logError(logger, "The computation phase rejects the input program.");

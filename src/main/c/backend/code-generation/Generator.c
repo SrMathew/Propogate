@@ -1,9 +1,6 @@
 #include "Generator.h"
 
 /* MODULE INTERNAL STATE */
-
-const char _indentationCharacter = ' ';
-const char _indentationSize = 4;
 static Logger * _logger = NULL;
 
 /** Shutdown module's internal state. */
@@ -21,6 +18,7 @@ ModuleDestructor initializeGeneratorModule() {
 }
 
 /** PRIVATE FUNCTIONS */
+static void _generateContent(Content * content);
 /*
 static char * _indentation(const unsigned int indentationLevel);
 static const char _expressionTypeToCharacter(const ExpressionType type);
@@ -61,6 +59,7 @@ static void _generateConstant(const unsigned int indentationLevel, Constant * co
  * Creates the epilogue of the generated output, that is, the final lines that
  * completes a valid Latex document.
  */
+/*
 static void _generateEpilogue(const int value) {
 	_output(0, "%s%d%s",
 		"            [ $", value, "$, circle, draw, blue ]\n"
@@ -69,6 +68,7 @@ static void _generateEpilogue(const int value) {
 		"\\end{document}\n\n"
 	);
 }
+*/
 
 /**
  * Generates the output of an expression.
@@ -167,13 +167,16 @@ static void _output(const unsigned int indentationLevel, const char * const form
 	va_end(arguments);
 }
 */
+
 /** PUBLIC FUNCTIONS */
-/*
 void executeGenerator(CompilerState * compilerState) {
-	logDebugging(_logger, "Generating final output...");
-	_generatePrologue();
-	_generateProgram(compilerState->abstractSyntaxtTree);
-	_generateEpilogue(compilerState->value);
-	logDebugging(_logger, "Generation is done.");
+    logDebugging(_logger, "Generating final output...");
+    
+    Program * program = (Program *)compilerState->abstractSyntaxtTree;
+    
+    if (program != NULL && program->content != NULL) {
+        _generateContent(program->content);
+    }
+    
+    logDebugging(_logger, "Generation done.");
 }
-*/
