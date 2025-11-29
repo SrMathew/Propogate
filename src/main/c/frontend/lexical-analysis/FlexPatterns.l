@@ -19,11 +19,12 @@ extern CompilationStatus EOFLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
 
 /* LATEX FUNCTIONS */
-extern CompilationStatus EnterEnvironmentLexemeAction(FlexContext context);
-extern CompilationStatus LeaveEnvironmentLexemeAction();
-extern CompilationStatus EnterMathmodeLexemeAction(FlexContext context, TokenLabel label);
-extern CompilationStatus LeaveMathmodeLexemeAction(TokenLabel label);
-extern CompilationStatus MathmodeEnvironmentLexemeAction();
+// extern CompilationStatus EnterEnvironmentLexemeAction(FlexContext context);
+// extern CompilationStatus LeaveEnvironmentLexemeAction();
+// extern CompilationStatus EnterMathmodeLexemeAction(FlexContext context, TokenLabel label);
+// extern CompilationStatus LeaveMathmodeLexemeAction(TokenLabel label);
+// extern CompilationStatus MathmodeEnvironmentLexemeAction();
+extern CompilationStatus MathmodeEnvironmentLexemeAction(TokenLabel label);
 extern CompilationStatus BracketLexemeAction(TokenLabel label);
 extern CompilationStatus EnterCommentLexemeAction(FlexContext context);
 extern CompilationStatus LeaveCommentLexemeAction();
@@ -102,7 +103,7 @@ formula             \\[alpha|beta|chi|delta|epsilon|eta|gamma|iota|kappa|lambda|
 <PROPOGATE>{whitespace}             { return IgnoredLexemeAction(); }
 <PROPOGATE>.                        { return UnknownLexemeAction(); }
 
-"\\begin"                           { return EnterEnvironmentLexemeAction(ENVIRONMENT_DEF); }
+%{/*"\\begin"                           { return EnterEnvironmentLexemeAction(ENVIRONMENT_DEF); }
 "\\end"                             { return LeaveEnvironmentLexemeAction(); }
 <ENVIRONMENT_DEF>"math"             { return MathmodeEnvironmentLexemeAction(); }
 <ENVIRONMENT_DEF>"displaymath"      { return MathmodeEnvironmentLexemeAction(); }
@@ -115,7 +116,9 @@ formula             \\[alpha|beta|chi|delta|epsilon|eta|gamma|iota|kappa|lambda|
 <MATHMODE>"\\)"                     { return LeaveMathmodeLexemeAction(MM_CLOSE_PARENTHESIS); }
 <MATHMODE>"\\]"                     { return LeaveMathmodeLexemeAction(MM_CLOSE_BRACKET); }
 <MATHMODE>"$"                       { return LeaveMathmodeLexemeAction(MM_CLOSE_DOLLAR); }
-<MATHMODE>"$$"                      { return LeaveMathmodeLexemeAction(MM_CLOSE_DOUBLEDOLLAR); }
+<MATHMODE>"$$"                      { return LeaveMathmodeLexemeAction(MM_CLOSE_DOUBLEDOLLAR); }*/%}
+
+"$"                                 { return MathmodeEnvironmentLexemeAction(DOLLAR); }
 
 "{"                                 { return BracketLexemeAction(OPEN_BRACE); }
 "}"                                 { return BracketLexemeAction(CLOSE_BRACE); }

@@ -160,13 +160,10 @@ struct Math
 	union
 	{
 		Propogate *propogate;
-		struct 
-		{
-			Text *text;
-			Math *next;
-		};
-		MathType mathType;
+		Text *text;
 	};
+	Math *next;
+	MathType mathType;
 };
 
 struct Element
@@ -181,7 +178,7 @@ struct Element
 		};
 		Text *text;
 	};
-	ElementType elementType;	
+	ElementType elementType;
 };
 
 struct Content

@@ -153,11 +153,12 @@ Text *StringTextSemanticAction(char *text)
 	return newText;
 }
 
-Math *PropogateMathSemanticAction(Propogate *propogate)
+Math *PropogateMathSemanticAction(Propogate *propogate, Math *next)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Math *math = calloc(1, sizeof(Math));
 	math->propogate = propogate;
+	math->next = next;
 	math->mathType = PROPOGATE;
 	return math;
 }

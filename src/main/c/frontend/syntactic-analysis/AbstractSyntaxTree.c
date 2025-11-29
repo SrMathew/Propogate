@@ -138,7 +138,10 @@ void destroyPropogate(Propogate *propogate)
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (propogate != NULL)
 	{
-		destroyExpressionList(propogate->expressionList);
+		if (propogate->expressionList != NULL)
+		{
+			destroyExpressionList(propogate->expressionList);
+		}
 		free(propogate);
 	}
 }
@@ -158,6 +161,10 @@ void destroyMath(Math *math)
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (math != NULL)
 	{
+		if (math->next != NULL)
+		{
+			destroyMath(math->next);
+		}
 		switch (math->mathType)
 		{
 		case PROPOGATE:
@@ -170,10 +177,6 @@ void destroyMath(Math *math)
 			if (math->text != NULL)
 			{
 				destroyText(math->text);
-			}
-			if (math->next != NULL)
-			{
-				destroyMath(math->next);
 			}
 			break;
 		}
@@ -236,7 +239,10 @@ void destroyProgram(Program *program)
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (program != NULL)
 	{
-		destroyContent(program->content);
+		if (program->content != NULL)
+		{
+			destroyContent(program->content);
+		}
 		free(program);
 	}
 }
