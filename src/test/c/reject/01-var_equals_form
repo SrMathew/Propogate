@@ -1,5 +1,1 @@
-\documentclass{article}
-\begin{document}
-\newcommand{\propogate}[1]{#1}
-$\propogate{p = (p \wedge q)}$
-\end{document}
+$[!propogate]{p = (p \wedge q)}$

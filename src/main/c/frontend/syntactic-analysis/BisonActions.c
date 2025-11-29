@@ -43,8 +43,10 @@ static void _logSyntacticAnalyzerAction(const char *functionName)
 Variable *StringVariableSemanticAction(char *name)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	if (!name) logError(_logger, "%s: name is NULL", __FUNCTION__);
-    else logDebugging(_logger, "%s: name='%s'", __FUNCTION__, name);
+	if (!name)
+		logError(_logger, "%s: name is NULL", __FUNCTION__);
+	else
+		logDebugging(_logger, "%s: name='%s'", __FUNCTION__, name);
 	Variable *newVariable = calloc(1, sizeof(Variable));
 	newVariable->name = name;
 	return newVariable;
@@ -93,8 +95,10 @@ Definition *VariableDefinitionSemanticAction(Variable *variable, bool value)
 Definition *FormulaDefinitionSemanticAction(Formula *formula, char *name)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	if (!name) logError(_logger, "StringVariableSemanticAction: name is NULL");
-    else logDebugging(_logger, "StringVariableSemanticAction: name='%s'", name);
+	if (!name)
+		logError(_logger, "%s: name is NULL", __FUNCTION__);
+	else
+		logDebugging(_logger, "%s: name='%s'", __FUNCTION__, name);
 	Definition *definition = calloc(1, sizeof(Definition));
 	definition->formula = formula;
 	definition->name = name;
@@ -129,11 +133,94 @@ ExpressionList *ExpressionListSemanticAction(Expression *expression, ExpressionL
 	return newExpressionList;
 }
 
-Program *ExpressionListProgramSemanticAction(ExpressionList *expressionList)
+Propogate *ExpressionListPropogateSemanticAction(ExpressionList *expressionList)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Propogate *propogate = calloc(1, sizeof(Propogate));
+	propogate->expressionList = expressionList;
+	return propogate;
+}
+
+Text *StringTextSemanticAction(char *text)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	if (!text)
+		logError(_logger, "%s: text is NULL", __FUNCTION__);
+	else
+		logDebugging(_logger, "%s: text='%s'", __FUNCTION__, text);
+	Text *newText = calloc(1, sizeof(Text));
+	newText->text = text;
+	return newText;
+}
+
+Math *PropogateMathSemanticAction(Propogate *propogate, Math *next)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Math *math = calloc(1, sizeof(Math));
+	math->propogate = propogate;
+	math->next = next;
+	math->mathType = PROPOGATE;
+	return math;
+}
+
+Math *TextMathSemanticAction(Text *text, Math *next)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Math *math = calloc(1, sizeof(Math));
+	math->text = text;
+	math->next = next;
+	math->mathType = TEXT_ONLY;
+	return math;
+}
+
+Element *MathElementSemanticAction(Math *math)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Element *element = calloc(1, sizeof(Element));
+	element->math = math;
+	element->elementType = MATH;
+	return element;
+}
+
+Element *ContentElementSemanticAction(Content *content, Text *environmentLeft, Text *environmentRight)
+{
+	// Uso dos Text porque tienen que coincidir, pero solo me guardo uno, por lo que destruyo el otro
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	if (strcmp(environmentLeft->text, environmentRight->text) != 0)
+		logError(_logger, "%s: environments don't match", __FUNCTION__);
+	else
+		logDebugging(_logger, "%s: environment='%s'", __FUNCTION__, environmentLeft->text);
+	Element *element = calloc(1, sizeof(Element));
+	element->content = content;
+	element->environment = environmentLeft;
+	element->elementType = ENVIRONMENT;
+	destroyText(environmentRight);
+	return element;
+}
+
+Element *TextElementSemanticAction(Text *text)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Element *element = calloc(1, sizeof(Element));
+	element->text = text;
+	element->elementType = TEXT_ONLY;
+	return element;
+}
+
+Content *ElementContentSemanticAction(Element *element, Content *next)
+{
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Content *content = calloc(1, sizeof(Content));
+	content->element = element;
+	content->next = next;
+	return content;
+}
+
+Program *ContentProgramSemanticAction(Content *content)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program *program = calloc(1, sizeof(Program));
-	program->expressionList = expressionList;
+	program->content = content;
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }

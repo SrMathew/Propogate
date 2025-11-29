@@ -1,0 +1,7 @@
+$[!propogate]{p = TRUE}$
+$$[!propogate]{q = true}$$
+\([!propogate]{r = 1}\)
+\[[!propogate]{s = Verdadero}\]
+\begin{math}[!propogate]{t = FALSE}\end{math}
+\begin{displaymath}[!propogate]{u = 0}\end{displaymath}
+\begin{equation}[!propogate]{v = Falso}\end{equation}

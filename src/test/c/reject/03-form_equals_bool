@@ -1,5 +1,1 @@
-\documentclass{article}
-\begin{document}
-\newcommand{\propogate}[1]{#1}
-$\propogate{(p \wedge q) = true}$
-\end{document}
+$[!propogate]{(p \wedge q) = true}$

@@ -14,29 +14,30 @@
  * @see https://westes.github.io/flex/manual/Definitions-Section.html#Definitions-Section
  */
 
-// TODO check which function will be recycle, modified or deleted
+/* PUBLIC FUNCTIONS */
 extern CompilationStatus EOFLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
-extern CompilationStatus ParenthesisLexemeAction(TokenLabel label);
+
+/* LATEX FUNCTIONS */
+extern CompilationStatus NamedEnvironmentLexemeAction(TokenLabel label);
+extern CompilationStatus MathmodeEnvironmentLexemeAction(TokenLabel label);
+extern CompilationStatus BracketLexemeAction(TokenLabel label);
+extern CompilationStatus EnterCommentLexemeAction(FlexContext context);
+extern CompilationStatus LeaveCommentLexemeAction();
+extern CompilationStatus TextLexemeAction();
 extern CompilationStatus UnknownLexemeAction();
 
-extern CompilationStatus EnterCommandDefinedLexemeAction(FlexContext context);
-extern CompilationStatus LeaveCommandDefinedLexemeAction();
-extern CompilationStatus EnterLaTeXMathModeLexemeAction(FlexContext context);
-extern CompilationStatus LeaveLaTeXMathModeLexemeAction();
+/* PROPOGATE FUNCTIONS */
 extern CompilationStatus EnterPropogateLexemeAction(FlexContext context);
 extern CompilationStatus LeavePropogateLexemeAction();
-
 extern CompilationStatus SeparatorLexemeAction();
 extern CompilationStatus EqualsLexemeAction();
-
 extern CompilationStatus BinaryOperatorLexemeAction(TokenLabel label);
 extern CompilationStatus UnaryOperatorLexemeAction(TokenLabel label);
-
 extern CompilationStatus FormulaLexemeAction(TokenLabel label);
-
 extern CompilationStatus TrueLexemeAction();
 extern CompilationStatus FalseLexemeAction();
+
 %}
 
 /**
@@ -45,8 +46,7 @@ extern CompilationStatus FalseLexemeAction();
  * @see https://westes.github.io/flex/manual/Start-Conditions.html
  */
 
-%x DEFINED
-%x MATHMODE
+%x COMMENT
 %x PROPOGATE
 
 /**
@@ -56,6 +56,9 @@ extern CompilationStatus FalseLexemeAction();
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 whitespace			[[:space:]]+
+break               [\n][\r][\t]+
+variable            [a-z]+
+formula             (\\alpha|\\beta|\\chi|\\delta|\\epsilon|\\eta|\\gamma|\\iota|\\kappa|\\lambda|\\mu|\\nu|\\omega|\\phi|\\pi|\\psi|\\rho|\\sigma|\\tau|\\theta|\\upsilon|\\xi|\\zeta)+
 %%
 
 %{
@@ -66,16 +69,7 @@ whitespace			[[:space:]]+
 
 %}
 
-"\\newcommand{\\propogate}[1]{#1}"    { return EnterCommandDefinedLexemeAction(DEFINED); }
-
-<DEFINED>"\\("                      { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-<DEFINED>"$"                        { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-<DEFINED>"\\begin{math}"            { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-<DEFINED>"\\["                      { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-<DEFINED>"\\begin{displaymath}"     { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-<DEFINED>"\\begin{equation}"        { return EnterLaTeXMathModeLexemeAction(MATHMODE); }
-
-<MATHMODE>"\\propogate{"            { return EnterPropogateLexemeAction(PROPOGATE); }
+"[!propogate]"                      { return EnterPropogateLexemeAction(PROPOGATE); }
 
 <PROPOGATE>"\\wedge"                { return BinaryOperatorLexemeAction(AND); }
 <PROPOGATE>"\\vee"                  { return BinaryOperatorLexemeAction(OR); }
@@ -85,77 +79,55 @@ whitespace			[[:space:]]+
 
 <PROPOGATE>"="                      { return EqualsLexemeAction(); }
 
-<PROPOGATE>[a-z]+                   { return FormulaLexemeAction(VAR_NAME); }
+<PROPOGATE>[Tt][Rr][Uu][Ee]         { return TrueLexemeAction(); }
+<PROPOGATE>[Vv][Ee][Rr][Dd][Aa][Dd][Ee][Rr][Oo] { return TrueLexemeAction(); }
+<PROPOGATE>"1"                      { return TrueLexemeAction(); }
 
-<PROPOGATE>"\\alpha"                { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\beta"                 { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\chi"                  { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\delta"                { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\epsilon"              { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\eta"                  { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\gamma"                { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\iota"                 { return FormulaLexemeAction(FORM_NAME); }
+<PROPOGATE>[Ff][Aa][Ll][Ss][Ee]     { return FalseLexemeAction(); }
+<PROPOGATE>[Ff][Aa][Ll][Ss][Oo]     { return FalseLexemeAction(); }
+<PROPOGATE>"0"                      { return FalseLexemeAction(); }
 
-<PROPOGATE>"\\kappa"                { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\lambda"               { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\mu"                   { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\nu"                   { return FormulaLexemeAction(FORM_NAME); }
-
-<PROPOGATE>"\\omega"                { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\phi"                  { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\pi"                   { return FormulaLexemeAction(FORM_NAME); }
-
-<PROPOGATE>"\\psi"                  { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\rho"                  { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\sigma"                { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\tau"                  { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\theta"                { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\upsilon"              { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\xi"                   { return FormulaLexemeAction(FORM_NAME); }
-<PROPOGATE>"\\zeta"                 { return FormulaLexemeAction(FORM_NAME); }
-
-<PROPOGATE>"TRUE"                   { return TrueLexemeAction(); }
-<PROPOGATE>"FALSE"                  { return FalseLexemeAction(); }
-
-<PROPOGATE>"("						{ return ParenthesisLexemeAction(OPEN_PARENTHESIS); }
-<PROPOGATE>")"                      { return ParenthesisLexemeAction(CLOSE_PARENTHESIS); }
+<PROPOGATE>"("						{ return BracketLexemeAction(OPEN_PARENTHESIS); }
+<PROPOGATE>")"                      { return BracketLexemeAction(CLOSE_PARENTHESIS); }
 
 <PROPOGATE>","                      { return SeparatorLexemeAction(); }
-<PROPOGATE>"\n"                     { return IgnoredLexemeAction(); }
 
+<PROPOGATE>"{"                      { return BracketLexemeAction(OPEN_BRACE); }
 <PROPOGATE>"}"                      { return LeavePropogateLexemeAction(); }
 
+<PROPOGATE>{variable}               { return FormulaLexemeAction(VAR_NAME); }
+<PROPOGATE>{formula}                { return FormulaLexemeAction(FORM_NAME); }
+
+<PROPOGATE>{break}                  { return IgnoredLexemeAction(); }
 <PROPOGATE>{whitespace}             { return IgnoredLexemeAction(); }
 <PROPOGATE>.                        { return UnknownLexemeAction(); }
 
-<MATHMODE>"\\)"                     { return LeaveLaTeXMathModeLexemeAction(); }
-<MATHMODE>"$"                       { return LeaveLaTeXMathModeLexemeAction(); }
-<MATHMODE>"\\end{math}"             { return LeaveLaTeXMathModeLexemeAction(); }
-<MATHMODE>"\\]"                     { return LeaveLaTeXMathModeLexemeAction(); }
-<MATHMODE>"\\end{displaymath}"      { return LeaveLaTeXMathModeLexemeAction(); }
-<MATHMODE>"\\end{equation}"         { return LeaveLaTeXMathModeLexemeAction(); }
+"\\begin"                           { return NamedEnvironmentLexemeAction(BEGIN_ENVIRONMENT); }
+"\\end"                             { return NamedEnvironmentLexemeAction(END_ENVIRONMENT); }
 
-%{
-    // Ignore everything else in Math mode
-%}
-<MATHMODE>[^(?!(?:\\\)|\$|\\end\{math\}|\\\]|\\end\{displaymath\}|\\end\{equation\})$).*$] { return IgnoredLexemeAction(); }
+"math"                              { return MathmodeEnvironmentLexemeAction(MATH_ENVIRONMENT); }
+"displaymath"                       { return MathmodeEnvironmentLexemeAction(DISPLAYMATH_ENVIRONMENT); }
+"equation"                          { return MathmodeEnvironmentLexemeAction(EQUATION_ENVIRONMENT); }
 
-<MATHMODE>.                         { return IgnoredLexemeAction(); }
+"$$"                                { return MathmodeEnvironmentLexemeAction(DDOLLAR); }
+"$"                                 { return MathmodeEnvironmentLexemeAction(DOLLAR); }
+"\\("                               { return MathmodeEnvironmentLexemeAction(MM_OPEN_PARENTHESIS); }
+"\\)"                               { return MathmodeEnvironmentLexemeAction(MM_CLOSE_PARENTHESIS); }
+"\\["                               { return MathmodeEnvironmentLexemeAction(MM_OPEN_BRACKET); }
+"\\]"                               { return MathmodeEnvironmentLexemeAction(MM_CLOSE_BRACKET); }
 
-<DEFINED>"\\end{document}"          { return LeaveCommandDefinedLexemeAction(); }
+"{"                                 { return BracketLexemeAction(OPEN_BRACE); }
+"}"                                 { return BracketLexemeAction(CLOSE_BRACE); }
 
-%{
-    // Ignore everything else in the document    
-%}
+"["                                 { return BracketLexemeAction(OPEN_BRACKET); }
+"]"                                 { return BracketLexemeAction(CLOSE_BRACKET); }
 
-<DEFINED>[^(?!(?:\\\(|\$|\\begin\{math\}|\\\[|\\begin\{displaymath\}|\\begin\{equation\}|\\end\{document\})$).*$] { return IgnoredLexemeAction(); }
+"%"                                 { return EnterCommentLexemeAction(COMMENT); }
+<COMMENT>"%"                        { return LeaveCommentLexemeAction(); }
+<COMMENT>.                          { return IgnoredLexemeAction(); }
 
-<DEFINED>.                          { return IgnoredLexemeAction(); }
-
-%{
-    // Ignore everything in the document if the command was not defined
-%}
-[^(?!\\newcommand\{\\propogate\}\[1\]\{#1\}$).*$] { return IgnoredLexemeAction(); }
+{break}                             { return IgnoredLexemeAction(); }
+[^\\{}#\$%\^_~\[\]\n]+              { return TextLexemeAction(); }
 
 .									{ return IgnoredLexemeAction(); }
 

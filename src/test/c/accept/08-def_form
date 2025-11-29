@@ -1,5 +1,1 @@
-\documentclass{article}
-\begin{document}
-\newcommand{\propogate}[1]{#1}
-$\propogate{\alpha = p}$
-\end{document}
+$[!propogate]{\alpha = p}$

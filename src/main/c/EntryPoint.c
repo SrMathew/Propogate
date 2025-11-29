@@ -28,7 +28,7 @@ const int main(const int length, const char ** arguments) {
 		initializeFlexActionsModule(lexicalAnalyzer),
 		initializeBisonActionsModule(&compilerState),
 		initializeFrontendModule(lexicalAnalyzer),
-		//initializeCalculatorModule(),  --> initializePropogateModule(),
+		initializePropogateModule(),
 		//initializeGeneratorModule()	--> same
 	};
 	CompilationStatus compilationStatus = executeSyntacticAnalysis();
@@ -36,16 +36,16 @@ const int main(const int length, const char ** arguments) {
 	if (compilationStatus == SUCCEEDED) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
-		/* logDebugging(logger, "Computing expression value...");
-		ValuationResult valuationResult = executePropogate(&compilerState);
+		logDebugging(logger, "Computing expression value...");
+		EvaluationResult valuationResult = executePropogate(&compilerState);
 		if (valuationResult.succeeded) {
 			compilerState.value = valuationResult.value;
-			executeGenerator(&compilerState);
+			//executeGenerator(&compilerState);
 		}
 		else {
 			logError(logger, "The computation phase rejects the input program.");
 			compilationStatus = FAILED;
-		} */
+		}
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
 	}

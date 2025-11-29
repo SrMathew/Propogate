@@ -37,6 +37,11 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	Definition * definition;
 	Expression * expression;
 	ExpressionList * expressionList;
+	Propogate * propogate;
+	Text * text;
+	Math * math;
+	Element * element;
+	Content * content;
 	Program * program;
 }
 
@@ -54,6 +59,11 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %destructor { destroyDefinition($$); } <definition>
 %destructor { destroyExpression($$); } <expression>
 %destructor { destroyExpressionList($$); } <expressionList>
+%destructor { destroyPropogate($$); } <propogate>
+%destructor { destroyText($$); } <text>
+%destructor { destroyMath($$); } <math>
+%destructor { destroyElement($$); } <element>
+%destructor { destroyContent($$); } <content>
 
 /** Terminals. */
 %token <string> VAR_NAME
@@ -70,8 +80,29 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 %token <token> SEPARATOR
 
+%token <token> PROPOGATE_COMMAND
+
 %token <token> OPEN_PARENTHESIS
+%token <token> OPEN_BRACKET
+%token <token> OPEN_BRACE
 %token <token> CLOSE_PARENTHESIS
+%token <token> CLOSE_BRACKET
+%token <token> CLOSE_BRACE
+
+%token <token> BEGIN_ENVIRONMENT
+%token <token> END_ENVIRONMENT
+
+%token <token> MATH_ENVIRONMENT
+%token <token> DISPLAYMATH_ENVIRONMENT
+%token <token> EQUATION_ENVIRONMENT
+%token <token> MM_OPEN_PARENTHESIS
+%token <token> MM_OPEN_BRACKET
+%token <token> MM_CLOSE_PARENTHESIS
+%token <token> MM_CLOSE_BRACKET
+%token <token> DDOLLAR
+%token <token> DOLLAR
+
+%token <string> TEXT
 
 %token <token> IGNORED
 %token <token> UNKNOWN
@@ -82,9 +113,13 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <definition> definition
 %type <expression> expression
 %type <expressionList> expressionList
+%type <propogate> propogate
+%type <text> text
+%type <math> math
+%type <element> element
+%type <content> content
 %type <program> program
 
-// TODO define precedence and associativity
 /**
  * Precedence and associativity.
  *
@@ -97,19 +132,62 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %%
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
-program: expressionList															{ $$ = ExpressionListProgramSemanticAction($1); }
+program: 
+	  content 																	{ $$ = ContentProgramSemanticAction($1); }
 	;
 
-expressionList: expressionList SEPARATOR expression								{ $$ = ExpressionListSemanticAction($3, $1); }
+content: 
+	  content element  															{ $$ = ElementContentSemanticAction($2, $1); }
+	| %empty																	{ $$ = NULL; }
+	;
+
+// TODO: element puede ser basura o estar en mathmode
+element: 
+	  DDOLLAR math DDOLLAR														{ $$ = MathElementSemanticAction($2); }
+	| DOLLAR math DOLLAR														{ $$ = MathElementSemanticAction($2); }
+	| MM_OPEN_PARENTHESIS math MM_CLOSE_PARENTHESIS								{ $$ = MathElementSemanticAction($2); }
+	| MM_OPEN_BRACKET math MM_CLOSE_BRACKET	 			 						{ $$ = MathElementSemanticAction($2); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE MATH_ENVIRONMENT CLOSE_BRACE math END_ENVIRONMENT OPEN_BRACE MATH_ENVIRONMENT CLOSE_BRACE
+																				{ $$ = MathElementSemanticAction($5); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE DISPLAYMATH_ENVIRONMENT CLOSE_BRACE math END_ENVIRONMENT OPEN_BRACE DISPLAYMATH_ENVIRONMENT CLOSE_BRACE
+																				{ $$ = MathElementSemanticAction($5); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE EQUATION_ENVIRONMENT CLOSE_BRACE math END_ENVIRONMENT OPEN_BRACE EQUATION_ENVIRONMENT CLOSE_BRACE
+																				{ $$ = MathElementSemanticAction($5); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE
+																				{ $$ = ContentElementSemanticAction($5, $3, $8); }																			
+	| text																		{ $$ = TextElementSemanticAction($1); }
+	;
+
+math: 
+	  math PROPOGATE_COMMAND OPEN_BRACE propogate CLOSE_BRACE					{ $$ = PropogateMathSemanticAction($4, $1); }
+	| math text																	{ $$ = TextMathSemanticAction($2, $1); }
+	| %empty																	{ $$ = NULL;}
+	;
+
+text:
+	  OPEN_BRACE TEXT CLOSE_BRACE												{ $$ = StringTextSemanticAction($2); }
+	| OPEN_BRACKET TEXT CLOSE_BRACKET											{ $$ = StringTextSemanticAction($2); }
+	| OPEN_PARENTHESIS TEXT CLOSE_PARENTHESIS									{ $$ = StringTextSemanticAction($2); }
+	| TEXT 																		{ $$ = StringTextSemanticAction($1); }										
+	;
+
+propogate: 
+	  expressionList															{ $$ = ExpressionListPropogateSemanticAction($1); }
+	;
+
+expressionList: 
+	  expressionList SEPARATOR expression										{ $$ = ExpressionListSemanticAction($3, $1); }
 	| expression																{ $$ = ExpressionListSemanticAction($1, NULL); }
 	| %empty																	{ $$ = NULL; }
 	;
 
-expression: definition															{ $$ = DefinitionExpressionSemanticAction($1); }
+expression: 
+	  definition																{ $$ = DefinitionExpressionSemanticAction($1); }
 	| formula																	{ $$ = FormulaExpressionSemanticAction($1); }
 	;
 
-definition: variable EQUALS VALUE												{ $$ = VariableDefinitionSemanticAction($1, $3);}
+definition: 
+	  variable EQUALS VALUE														{ $$ = VariableDefinitionSemanticAction($1, $3);}
 	| FORM_NAME EQUALS formula													{ $$ = FormulaDefinitionSemanticAction($3, $1);}
 	;
 
@@ -120,7 +198,8 @@ NEG OPEN_PARENTHESIS formula[left] OR formula[right] CLOSE_PARENTHESIS 		{ $$ = 
 NEG OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS	{ $$ = BinaryFormulaSemanticAction($left, $right, NAND); }
 */
 
-formula: OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS	{ $$ = BinaryFormulaSemanticAction($left, $right, AND_TYPE); }
+formula: 
+	  OPEN_PARENTHESIS formula[left] AND formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, AND_TYPE); }
 	| OPEN_PARENTHESIS formula[left] OR formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, OR_TYPE); }
 	| OPEN_PARENTHESIS formula[left] IMPLY formula[right] CLOSE_PARENTHESIS		{ $$ = BinaryFormulaSemanticAction($left, $right, IMPLY_TYPE); }
 	| NEG OPEN_PARENTHESIS formula CLOSE_PARENTHESIS							{ $$ = UnaryFormulaSemanticAction($3, NEG_TYPE); }

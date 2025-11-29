@@ -25,5 +25,13 @@ Definition *FormulaDefinitionSemanticAction(Formula *formula, char *name);
 Expression *DefinitionExpressionSemanticAction(Definition *definition);
 Expression *FormulaExpressionSemanticAction(Formula *formula);
 ExpressionList *ExpressionListSemanticAction(Expression *expression, ExpressionList *expressionList);
-Program *ExpressionListProgramSemanticAction(ExpressionList *expressionList);
+Propogate *ExpressionListPropogateSemanticAction(ExpressionList *expressionList);
+Text *StringTextSemanticAction(char *text);
+Math *PropogateMathSemanticAction(Propogate *propogate, Math *next);
+Math *TextMathSemanticAction(Text *text, Math *next);
+Element *MathElementSemanticAction(Math *math);
+Element *ContentElementSemanticAction(Content *content, Text *environmentLeft, Text *environmentRight);
+Element *TextElementSemanticAction(Text *text);
+Content *ElementContentSemanticAction(Element *element, Content *next);
+Program *ContentProgramSemanticAction(Content *content);
 #endif
