@@ -37,6 +37,11 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	Definition * definition;
 	Expression * expression;
 	ExpressionList * expressionList;
+	Propogate * propogate;
+	Text * text;
+	Math * math;
+	Element * element;
+	Content * content;
 	Program * program;
 }
 
@@ -54,6 +59,12 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %destructor { destroyDefinition($$); } <definition>
 %destructor { destroyExpression($$); } <expression>
 %destructor { destroyExpressionList($$); } <expressionList>
+%destructor { destroyPropogate($$); } <propogate>
+%destructor { destroyText($$); } <text>
+%destructor { destroyMath($$); } <math>
+%destructor { destroyElement($$); } <element>
+%destructor { destroyContent($$); } <content>
+%destructor { destroyProgram($$); } <program>
 
 /** Terminals. */
 %token <string> VAR_NAME
@@ -70,8 +81,29 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 %token <token> SEPARATOR
 
+%token <token> PROPOGATE_COMMAND
+
 %token <token> OPEN_PARENTHESIS
+%token <token> OPEN_BRACKET
+%token <token> OPEN_BRACE
 %token <token> CLOSE_PARENTHESIS
+%token <token> CLOSE_BRACKET
+%token <token> CLOSE_BRACE
+
+%token <token> BEGIN_ENVIRONMENT
+%token <token> END_ENVIRONMENT
+
+%token <string> MM_ENVIRONMENT
+%token <token> MM_OPEN_PARENTHESIS
+%token <token> MM_OPEN_BRACKET
+%token <token> MM_OPEN_DOLLAR
+%token <token> MM_OPEN_DOUBLEDOLLAR
+%token <token> MM_CLOSE_PARENTHESIS
+%token <token> MM_CLOSE_BRACKET
+%token <token> MM_CLOSE_DOLLAR
+%token <token> MM_CLOSE_DOUBLEDOLLAR
+
+%token <string> TEXT
 
 %token <token> IGNORED
 %token <token> UNKNOWN
@@ -82,9 +114,13 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <definition> definition
 %type <expression> expression
 %type <expressionList> expressionList
+%type <propogate> propogate
+%type <text> text
+%type <math> math
+%type <element> element
+%type <content> content
 %type <program> program
 
-// TODO define precedence and associativity
 /**
  * Precedence and associativity.
  *
@@ -97,7 +133,34 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %%
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
-program: expressionList															{ $$ = ExpressionListProgramSemanticAction($1); }
+program: 
+	content 																	{ $$ = ContentProgramSemanticAction($1); }
+	;
+
+content: element content  														{ $$ = ElementContentSemanticAction($1, $2); }
+	| %empty																	{ $$ = NULL; }
+	;
+
+// TODO: element puede ser basura o estar en mathmode
+element: MM_OPEN_PARENTHESIS math MM_CLOSE_PARENTHESIS							{ $$ = MathBracketElementSemanticAction($2); }
+	| MM_OPEN_BRACKET math MM_CLOSE_BRACKET	 			 						{ $$ = MathBracketElementSemanticAction($2); }
+	| MM_OPEN_DOLLAR math MM_CLOSE_DOLLAR		 		 						{ $$ = MathBracketElementSemanticAction($2); }
+	| MM_OPEN_DOUBLEDOLLAR math MM_CLOSE_DOUBLEDOLLAR							{ $$ = MathBracketElementSemanticAction($2); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE MM_ENVIRONMENT CLOSE_BRACE math END_ENVIRONMENT OPEN_BRACE MM_ENVIRONMENT CLOSE_BRACE
+																				{ $$ = MathEnvironmentElementSemanticAction($5, $3, $8); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE
+																				{ $$ = ContentElementSemanticAction($5, $3, $8); }
+	| text																		{ $$ = TextElementSemanticAction($1); }
+	;
+
+math: PROPOGATE_COMMAND OPEN_BRACE propogate CLOSE_BRACE						{ $$ = PropogateMathSemanticAction($3); }
+	| text math																	{ $$ = TextMathSemanticAction($1, $2); }
+	;
+
+text: TEXT 																		{ $$ = StringTextSemanticAction($1); }										
+	;
+
+propogate: expressionList														{ $$ = ExpressionListPropogateSemanticAction($1); }
 	;
 
 expressionList: expressionList SEPARATOR expression								{ $$ = ExpressionListSemanticAction($3, $1); }

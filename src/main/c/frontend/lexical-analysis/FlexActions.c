@@ -87,9 +87,99 @@ CompilationStatus IgnoredLexemeAction()
 	return IN_PROGRESS;
 }
 
-CompilationStatus ParenthesisLexemeAction(TokenLabel label)
+/* LATEX FUNCTIONS */
+
+CompilationStatus EnterEnvironmentLexemeAction(FlexContext context)
+{
+	if (_logIgnoredLexemes)
+	{
+		Token *token = createToken(_lexicalAnalyzer, IGNORED);
+		_logTokenAction(__FUNCTION__, token);
+		destroyToken(token);
+	}
+	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
+	return IN_PROGRESS;
+}
+
+CompilationStatus LeaveEnvironmentLexemeAction()
+{
+	if (_logIgnoredLexemes)
+	{
+		Token *token = createToken(_lexicalAnalyzer, IGNORED);
+		_logTokenAction(__FUNCTION__, token);
+		destroyToken(token);
+	}
+	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
+	return IN_PROGRESS;
+}
+
+// Necesito un contexto Mathmode porque $ y $$ abren y cierran el mathmode indistinguiblemente
+CompilationStatus EnterMathmodeLexemeAction(FlexContext context, TokenLabel label)
 {
 	Token *token = createToken(_lexicalAnalyzer, label);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
+	return status;
+}
+
+CompilationStatus LeaveMathmodeLexemeAction(TokenLabel label)
+{
+	Token *token = createToken(_lexicalAnalyzer, label);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
+	return status;
+}
+
+CompilationStatus MathmodeEnvironmentLexemeAction()
+{
+	Token *token = createToken(_lexicalAnalyzer, MM_ENVIRONMENT);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	return status;
+}
+
+CompilationStatus BracketLexemeAction(TokenLabel label)
+{
+	Token *token = createToken(_lexicalAnalyzer, label);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	return status;
+}
+
+CompilationStatus EnterCommentLexemeAction(FlexContext context)
+{
+	if (_logIgnoredLexemes)
+	{
+		Token *token = createToken(_lexicalAnalyzer, IGNORED);
+		_logTokenAction(__FUNCTION__, token);
+		destroyToken(token);
+	}
+	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
+	return IN_PROGRESS;
+}
+
+CompilationStatus LeaveCommentLexemeAction()
+{
+	if (_logIgnoredLexemes)
+	{
+		Token *token = createToken(_lexicalAnalyzer, IGNORED);
+		_logTokenAction(__FUNCTION__, token);
+		destroyToken(token);
+	}
+	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
+	return IN_PROGRESS;
+}
+
+CompilationStatus TextLexemeAction()
+{
+	Token *token = createToken(_lexicalAnalyzer, TEXT);
+	token->semanticValue->string = strdup(token->lexeme);
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);
@@ -104,76 +194,26 @@ CompilationStatus UnknownLexemeAction()
 	return FAILED;
 }
 
-CompilationStatus EnterCommandDefinedLexemeAction(FlexContext context)
-{
-	if (_logIgnoredLexemes)
-	{
-		Token *token = createToken(_lexicalAnalyzer, IGNORED);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
-	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
-	return IN_PROGRESS;
-}
-
-CompilationStatus LeaveCommandDefinedLexemeAction()
-{
-	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
-	if (_logIgnoredLexemes)
-	{
-		Token *token = createToken(_lexicalAnalyzer, IGNORED);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
-	return IN_PROGRESS;
-}
-
-CompilationStatus EnterLaTeXMathModeLexemeAction(FlexContext context)
-{
-	if (_logIgnoredLexemes)
-	{
-		Token *token = createToken(_lexicalAnalyzer, IGNORED);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
-	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
-	return IN_PROGRESS;
-}
-
-CompilationStatus LeaveLaTeXMathModeLexemeAction()
-{
-	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
-	if (_logIgnoredLexemes)
-	{
-		Token *token = createToken(_lexicalAnalyzer, IGNORED);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
-	return IN_PROGRESS;
-}
+/* PROPOGATE FUNCTIONS */
 
 CompilationStatus EnterPropogateLexemeAction(FlexContext context)
 {
-	if (_logIgnoredLexemes)
-	{
-		Token *token = createToken(_lexicalAnalyzer, IGNORED);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
+	Token *token = createToken(_lexicalAnalyzer, PROPOGATE_COMMAND);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
 	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
-	return IN_PROGRESS;
+	return status;
 }
 
 CompilationStatus LeavePropogateLexemeAction()
 {
+	Token *token = createToken(_lexicalAnalyzer, CLOSE_BRACE);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
 	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
-	if (_logIgnoredLexemes)
-	{
-		Token *token = createToken(_lexicalAnalyzer, IGNORED);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
-	return IN_PROGRESS;
+	return status;
 }
 
 CompilationStatus SeparatorLexemeAction()
