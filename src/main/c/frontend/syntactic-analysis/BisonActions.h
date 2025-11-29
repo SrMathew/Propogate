@@ -27,7 +27,7 @@ Expression *FormulaExpressionSemanticAction(Formula *formula);
 ExpressionList *ExpressionListSemanticAction(Expression *expression, ExpressionList *expressionList);
 Propogate *ExpressionListPropogateSemanticAction(ExpressionList *expressionList);
 Text *StringTextSemanticAction(char *text);
-Math *PropogateMathSemanticAction(Propogate *propogate);
+Math *PropogateMathSemanticAction(Propogate *propogate, Math *next);
 Math *TextMathSemanticAction(Text *text, Math *next);
 Element *MathBracketElementSemanticAction(Math *math);
 Element *MathEnvironmentElementSemanticAction(Math *math, char *environmentLeft, char *environmentRight);

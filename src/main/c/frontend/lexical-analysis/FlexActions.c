@@ -89,6 +89,7 @@ CompilationStatus IgnoredLexemeAction()
 
 /* LATEX FUNCTIONS */
 
+/*
 CompilationStatus EnterEnvironmentLexemeAction(FlexContext context)
 {
 	if (_logIgnoredLexemes)
@@ -137,6 +138,16 @@ CompilationStatus LeaveMathmodeLexemeAction(TokenLabel label)
 CompilationStatus MathmodeEnvironmentLexemeAction()
 {
 	Token *token = createToken(_lexicalAnalyzer, MM_ENVIRONMENT);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	return status;
+}
+*/
+
+CompilationStatus MathmodeEnvironmentLexemeAction(TokenLabel label)
+{
+	Token *token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);
