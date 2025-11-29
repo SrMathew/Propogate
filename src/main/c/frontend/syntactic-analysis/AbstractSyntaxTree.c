@@ -85,7 +85,6 @@ void destroyDefinition(Definition *definition)
 			{
 				free(definition->name);
 				destroyFormula(definition->formula);
-				//free(definition->name);
 			}
 			break;
 		}
@@ -126,8 +125,109 @@ void destroyExpressionList(ExpressionList *expressionList)
 		{
 			destroyExpressionList(expressionList->next);
 		}
-		destroyExpression(expressionList->expression);
+		if (expressionList->expression != NULL)
+		{
+			destroyExpression(expressionList->expression);
+		}
 		free(expressionList);
+	}
+}
+
+void destroyPropogate(Propogate *propogate)
+{
+	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+	if (propogate != NULL)
+	{
+		destroyExpressionList(propogate->expressionList);
+		free(propogate);
+	}
+}
+
+void destroyText(Text *text)
+{
+	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+	if (text != NULL)
+	{
+		free(text->text);
+		free(text);
+	}
+}
+
+void destroyMath(Math *math)
+{
+	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+	if (math != NULL)
+	{
+		switch (math->mathType)
+		{
+		case PROPOGATE:
+			if (math->propogate != NULL)
+			{
+				destroyPropogate(math->propogate);
+			}
+			break;
+		case TEXT_ONLY:
+			if (math->text != NULL)
+			{
+				destroyText(math->text);
+			}
+			if (math->next != NULL)
+			{
+				destroyMath(math->next);
+			}
+			break;
+		}
+		free(math);
+	}
+}
+
+void destroyElement(Element *element)
+{
+	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+	if (element != NULL)
+	{
+		switch (element->elementType)
+		{
+		case MATH:
+			if (element->math != NULL)
+			{
+				destroyMath(element->math);
+			}
+			break;
+		case ENVIRONMENT:
+			if (element->environment != NULL)
+			{
+				destroyText(element->environment);
+			}
+			if (element->content != NULL)
+			{
+				destroyContent(element->content);
+			}
+			break;
+		case TEXT_ONLY:
+			if (element->text != NULL)
+			{
+				destroyText(element->text);
+			}
+		}
+		free(element);
+	}
+}
+
+void destroyContent(Content *content)
+{
+	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+	if (content != NULL)
+	{
+		if (content->next != NULL)
+		{
+			destroyContent(content->next);
+		}
+		if (content->element != NULL)
+		{
+			destroyElement(content->element);
+		}
+		free(content);
 	}
 }
 
@@ -136,7 +236,7 @@ void destroyProgram(Program *program)
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (program != NULL)
 	{
-		destroyExpressionList(program->expressionList);
+		destroyContent(program->content);
 		free(program);
 	}
 }

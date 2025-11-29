@@ -19,12 +19,19 @@ typedef enum UnaryFormulaType UnaryFormulaType;
 typedef enum FormulaType FormulaType;
 typedef enum DefinitionType DefinitionType;
 typedef enum ExpressionType ExpressionType;
+typedef enum MathType MathType;
+typedef enum ElementType ElementType;
 
 typedef struct Variable Variable;
 typedef struct Formula Formula;
 typedef struct Definition Definition;
 typedef struct Expression Expression;
 typedef struct ExpressionList ExpressionList;
+typedef struct Propogate Propogate;
+typedef struct Text Text;
+typedef struct Math Math;
+typedef struct Element Element;
+typedef struct Content Content;
 typedef struct Program Program;
 
 /**
@@ -61,6 +68,19 @@ enum ExpressionType
 {
 	DEF_EXPR,
 	FORM_EXPR
+};
+
+enum MathType
+{
+	PROPOGATE,
+	GARBAGE
+};
+
+enum ElementType
+{
+	MATH,
+	ENVIRONMENT,
+	TEXT_ONLY
 };
 
 struct Variable
@@ -125,9 +145,54 @@ struct ExpressionList
 	ExpressionList *next;
 };
 
-struct Program
+struct Propogate
 {
 	ExpressionList *expressionList;
+};
+
+struct Text
+{
+	char *text;
+};
+
+struct Math
+{
+	union
+	{
+		Propogate *propogate;
+		struct 
+		{
+			Text *text;
+			Math *next;
+		};
+		MathType mathType;
+	};
+};
+
+struct Element
+{
+	union
+	{
+		Math *math;
+		struct
+		{
+			Text *environment;
+			Content *content;
+		};
+		Text *text;
+	};
+	ElementType elementType;	
+};
+
+struct Content
+{
+	Element *element;
+	Content *next;
+};
+
+struct Program
+{
+	Content *content;
 };
 
 /**
@@ -139,6 +204,11 @@ void destroyFormula(Formula *formula);
 void destroyDefinition(Definition *definition);
 void destroyExpression(Expression *expression);
 void destroyExpressionList(ExpressionList *expressionList);
+void destroyPropogate(Propogate *propogate);
+void destroyText(Text *text);
+void destroyMath(Math *math);
+void destroyElement(Element *element);
+void destroyContent(Content *content);
 void destroyProgram(Program *program);
 
 #endif
