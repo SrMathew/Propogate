@@ -92,16 +92,14 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> BEGIN_ENVIRONMENT
 %token <token> END_ENVIRONMENT
 
-%token <string> MM_ENVIRONMENT
+%token <token> MATH_ENVIRONMENT
+%token <token> DISPLAYMATH_ENVIRONMENT
+%token <token> EQUATION_ENVIRONMENT
 %token <token> MM_OPEN_PARENTHESIS
 %token <token> MM_OPEN_BRACKET
-%token <token> MM_OPEN_DOLLAR
-%token <token> MM_OPEN_DOUBLEDOLLAR
 %token <token> MM_CLOSE_PARENTHESIS
 %token <token> MM_CLOSE_BRACKET
-%token <token> MM_CLOSE_DOLLAR
-%token <token> MM_CLOSE_DOUBLEDOLLAR
-
+%token <token> DDOLLAR
 %token <token> DOLLAR
 
 %token <string> TEXT
@@ -145,15 +143,18 @@ content:
 
 // TODO: element puede ser basura o estar en mathmode
 element: 
-	  /* MM_OPEN_PARENTHESIS math MM_CLOSE_PARENTHESIS								{ $$ = MathBracketElementSemanticAction($2); }
-	| MM_OPEN_BRACKET math MM_CLOSE_BRACKET	 			 						{ $$ = MathBracketElementSemanticAction($2); }
-	| MM_OPEN_DOLLAR math MM_CLOSE_DOLLAR		 		 						{ $$ = MathBracketElementSemanticAction($2); }
-	| MM_OPEN_DOUBLEDOLLAR math MM_CLOSE_DOUBLEDOLLAR							{ $$ = MathBracketElementSemanticAction($2); }
-	| BEGIN_ENVIRONMENT OPEN_BRACE MM_ENVIRONMENT CLOSE_BRACE math END_ENVIRONMENT OPEN_BRACE MM_ENVIRONMENT CLOSE_BRACE
-																				{ $$ = MathEnvironmentElementSemanticAction($5, $3, $8); } */
-	DOLLAR math DOLLAR														{ $$ = MathBracketElementSemanticAction($2); }
+	  DDOLLAR math DDOLLAR														{ $$ = MathElementSemanticAction($2); }
+	| DOLLAR math DOLLAR														{ $$ = MathElementSemanticAction($2); }
+	| MM_OPEN_PARENTHESIS math MM_CLOSE_PARENTHESIS								{ $$ = MathElementSemanticAction($2); }
+	| MM_OPEN_BRACKET math MM_CLOSE_BRACKET	 			 						{ $$ = MathElementSemanticAction($2); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE MATH_ENVIRONMENT CLOSE_BRACE math END_ENVIRONMENT OPEN_BRACE MATH_ENVIRONMENT CLOSE_BRACE
+																				{ $$ = MathElementSemanticAction($5); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE DISPLAYMATH_ENVIRONMENT CLOSE_BRACE math END_ENVIRONMENT OPEN_BRACE DISPLAYMATH_ENVIRONMENT CLOSE_BRACE
+																				{ $$ = MathElementSemanticAction($5); }
+	| BEGIN_ENVIRONMENT OPEN_BRACE EQUATION_ENVIRONMENT CLOSE_BRACE math END_ENVIRONMENT OPEN_BRACE EQUATION_ENVIRONMENT CLOSE_BRACE
+																				{ $$ = MathElementSemanticAction($5); }
 	| BEGIN_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE content END_ENVIRONMENT OPEN_BRACE text CLOSE_BRACE
-																				{ $$ = ContentElementSemanticAction($5, $3, $8); }
+																				{ $$ = ContentElementSemanticAction($5, $3, $8); }																			
 	| text																		{ $$ = TextElementSemanticAction($1); }
 	;
 
@@ -163,8 +164,11 @@ math:
 	| %empty																	{ $$ = NULL;}
 	;
 
-text: 
-	  TEXT 																		{ $$ = StringTextSemanticAction($1); }										
+text:
+	  OPEN_BRACE TEXT CLOSE_BRACE												{ $$ = StringTextSemanticAction($2); }
+	| OPEN_BRACKET TEXT CLOSE_BRACKET											{ $$ = StringTextSemanticAction($2); }
+	| OPEN_PARENTHESIS TEXT CLOSE_PARENTHESIS									{ $$ = StringTextSemanticAction($2); }
+	| TEXT 																		{ $$ = StringTextSemanticAction($1); }										
 	;
 
 propogate: 

@@ -1,5 +1,1 @@
-\documentclass{article}
-\begin{document}
-\newcommand{\propogate}[1]{#1}
-$\propogate{(p \wedge)}$
-\end{document}
+$[!propogate]{(p \wedge)}$

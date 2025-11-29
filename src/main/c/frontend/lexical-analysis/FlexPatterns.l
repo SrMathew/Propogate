@@ -19,11 +19,7 @@ extern CompilationStatus EOFLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
 
 /* LATEX FUNCTIONS */
-// extern CompilationStatus EnterEnvironmentLexemeAction(FlexContext context);
-// extern CompilationStatus LeaveEnvironmentLexemeAction();
-// extern CompilationStatus EnterMathmodeLexemeAction(FlexContext context, TokenLabel label);
-// extern CompilationStatus LeaveMathmodeLexemeAction(TokenLabel label);
-// extern CompilationStatus MathmodeEnvironmentLexemeAction();
+extern CompilationStatus NamedEnvironmentLexemeAction(TokenLabel label);
 extern CompilationStatus MathmodeEnvironmentLexemeAction(TokenLabel label);
 extern CompilationStatus BracketLexemeAction(TokenLabel label);
 extern CompilationStatus EnterCommentLexemeAction(FlexContext context);
@@ -50,8 +46,6 @@ extern CompilationStatus FalseLexemeAction();
  * @see https://westes.github.io/flex/manual/Start-Conditions.html
  */
 
-%x ENVIRONMENT_DEF
-%x MATHMODE
 %x COMMENT
 %x PROPOGATE
 
@@ -62,6 +56,7 @@ extern CompilationStatus FalseLexemeAction();
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 whitespace			[[:space:]]+
+break               [\n][\r][\t]+
 variable            [a-z]+
 formula             \\[alpha|beta|chi|delta|epsilon|eta|gamma|iota|kappa|lambda|mu|nu|omega|phi|pi|psi|rho|sigma|tau|theta|upsilon|xi|zeta]+
 %%
@@ -84,41 +79,42 @@ formula             \\[alpha|beta|chi|delta|epsilon|eta|gamma|iota|kappa|lambda|
 
 <PROPOGATE>"="                      { return EqualsLexemeAction(); }
 
-<PROPOGATE>{variable}               { return FormulaLexemeAction(VAR_NAME); }
+<PROPOGATE>[Tt][Rr][Uu][Ee]         { return TrueLexemeAction(); }
+<PROPOGATE>[Vv][Ee][Rr][Dd][Aa][Dd][Ee][Rr][Oo] { return TrueLexemeAction(); }
+<PROPOGATE>"1"                      { return TrueLexemeAction(); }
 
-<PROPOGATE>{formula}                { return FormulaLexemeAction(FORM_NAME); }
-
-<PROPOGATE>"TRUE"                   { return TrueLexemeAction(); }
-<PROPOGATE>"FALSE"                  { return FalseLexemeAction(); }
+<PROPOGATE>[Ff][Aa][Ll][Ss][Ee]     { return FalseLexemeAction(); }
+<PROPOGATE>[Ff][Aa][Ll][Ss][Oo]     { return FalseLexemeAction(); }
+<PROPOGATE>"0"                      { return FalseLexemeAction(); }
 
 <PROPOGATE>"("						{ return BracketLexemeAction(OPEN_PARENTHESIS); }
 <PROPOGATE>")"                      { return BracketLexemeAction(CLOSE_PARENTHESIS); }
 
 <PROPOGATE>","                      { return SeparatorLexemeAction(); }
-<PROPOGATE>"\n"                     { return IgnoredLexemeAction(); }
 
 <PROPOGATE>"{"                      { return BracketLexemeAction(OPEN_BRACE); }
 <PROPOGATE>"}"                      { return LeavePropogateLexemeAction(); }
 
+<PROPOGATE>{variable}               { return FormulaLexemeAction(VAR_NAME); }
+<PROPOGATE>{formula}                { return FormulaLexemeAction(FORM_NAME); }
+
+<PROPOGATE>{break}                  { return IgnoredLexemeAction(); }
 <PROPOGATE>{whitespace}             { return IgnoredLexemeAction(); }
 <PROPOGATE>.                        { return UnknownLexemeAction(); }
 
-%{/*"\\begin"                           { return EnterEnvironmentLexemeAction(ENVIRONMENT_DEF); }
-"\\end"                             { return LeaveEnvironmentLexemeAction(); }
-<ENVIRONMENT_DEF>"math"             { return MathmodeEnvironmentLexemeAction(); }
-<ENVIRONMENT_DEF>"displaymath"      { return MathmodeEnvironmentLexemeAction(); }
-<ENVIRONMENT_DEF>"equation"         { return MathmodeEnvironmentLexemeAction(); }
+"\\begin"                           { return NamedEnvironmentLexemeAction(BEGIN_ENVIRONMENT); }
+"\\end"                             { return NamedEnvironmentLexemeAction(END_ENVIRONMENT); }
 
-"\\("                               { return EnterMathmodeLexemeAction(MATHMODE, MM_OPEN_PARENTHESIS); }
-"\\["                               { return EnterMathmodeLexemeAction(MATHMODE, MM_OPEN_BRACKET); }
-"$"                                 { return EnterMathmodeLexemeAction(MATHMODE, MM_OPEN_DOLLAR); }
-"$$"                                { return EnterMathmodeLexemeAction(MATHMODE, MM_OPEN_DOUBLEDOLLAR); }
-<MATHMODE>"\\)"                     { return LeaveMathmodeLexemeAction(MM_CLOSE_PARENTHESIS); }
-<MATHMODE>"\\]"                     { return LeaveMathmodeLexemeAction(MM_CLOSE_BRACKET); }
-<MATHMODE>"$"                       { return LeaveMathmodeLexemeAction(MM_CLOSE_DOLLAR); }
-<MATHMODE>"$$"                      { return LeaveMathmodeLexemeAction(MM_CLOSE_DOUBLEDOLLAR); }*/%}
+"math"                              { return MathmodeEnvironmentLexemeAction(MATH_ENVIRONMENT); }
+"displaymath"                       { return MathmodeEnvironmentLexemeAction(DISPLAYMATH_ENVIRONMENT); }
+"equation"                          { return MathmodeEnvironmentLexemeAction(EQUATION_ENVIRONMENT); }
 
+"$$"                                { return MathmodeEnvironmentLexemeAction(DDOLLAR); }
 "$"                                 { return MathmodeEnvironmentLexemeAction(DOLLAR); }
+"\\("                               { return MathmodeEnvironmentLexemeAction(MM_OPEN_PARENTHESIS); }
+"\\)"                               { return MathmodeEnvironmentLexemeAction(MM_CLOSE_PARENTHESIS); }
+"\\["                               { return MathmodeEnvironmentLexemeAction(MM_OPEN_BRACKET); }
+"\\]"                               { return MathmodeEnvironmentLexemeAction(MM_CLOSE_BRACKET); }
 
 "{"                                 { return BracketLexemeAction(OPEN_BRACE); }
 "}"                                 { return BracketLexemeAction(CLOSE_BRACE); }
@@ -130,6 +126,7 @@ formula             \\[alpha|beta|chi|delta|epsilon|eta|gamma|iota|kappa|lambda|
 <COMMENT>"%"                        { return LeaveCommentLexemeAction(); }
 <COMMENT>.                          { return IgnoredLexemeAction(); }
 
+{break}                             { return IgnoredLexemeAction(); }
 [^\\{}#\$%\^_~\[\]\n]+              { return TextLexemeAction(); }
 
 .									{ return IgnoredLexemeAction(); }
