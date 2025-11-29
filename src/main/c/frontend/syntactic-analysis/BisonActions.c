@@ -173,22 +173,9 @@ Math *TextMathSemanticAction(Text *text, Math *next)
 	return math;
 }
 
-Element *MathBracketElementSemanticAction(Math *math)
+Element *MathElementSemanticAction(Math *math)
 {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Element *element = calloc(1, sizeof(Element));
-	element->math = math;
-	element->elementType = MATH;
-	return element;
-}
-
-Element *MathEnvironmentElementSemanticAction(Math *math, char *environmentLeft, char *environmentRight)
-{
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	if (strcmp(environmentLeft, environmentRight) == 0)
-		logError(_logger, "%s: environments don't match", __FUNCTION__);
-	else
-		logDebugging(_logger, "%s: environment='%s'", __FUNCTION__, environmentLeft);
 	Element *element = calloc(1, sizeof(Element));
 	element->math = math;
 	element->elementType = MATH;
