@@ -16,6 +16,7 @@ typedef struct VariableState {
 
 static VariableState * _symbolTable = NULL;
 
+
 /** Shutdown module's internal state. */
 void _shutdownPropogateModule() {
 	if (_logger != NULL) {
@@ -44,6 +45,16 @@ ModuleDestructor initializePropogateModule() {
 }
 
 /** PRIVATE FUNCTIONS */
+static void _setVariableValue(const char * name, bool value);
+static EvaluationResult _getVariableValue(const char * name);
+static EvaluationResult _invalidEvaluation();
+static EvaluationResult _operateBinary(BinaryFormulaType type, EvaluationResult left, EvaluationResult right);
+static EvaluationResult _operateUnary(UnaryFormulaType type, EvaluationResult op);
+static void _processContent(Content * content, EvaluationResult * globalResult);
+static void _processPropogateBlock(Propogate * propogateNode, EvaluationResult * globalResult);
+static void _processElement(Element * element, EvaluationResult * globalResult);
+
+
 /** SYMBOL TABLE */
 static void _setVariableValue(const char * name, bool value) {
 	VariableState * current = _symbolTable;
@@ -124,9 +135,6 @@ static EvaluationResult _operateUnary(UnaryFormulaType type, EvaluationResult op
 
 
 /** FUNCTION TO WALK THROUGH THE TREE */
-// Declaration for recursion (Environment -> Content -> Element)
-static void _processContent(Content * content, EvaluationResult * globalResult);
-
 static void _processPropogateBlock(Propogate * propogateNode, EvaluationResult * globalResult) {
     if (propogateNode == NULL || propogateNode->expressionList == NULL) return;
 
@@ -201,6 +209,9 @@ static void _processContent(Content * content, EvaluationResult * globalResult) 
 
 
 /** PUBLIC FUNCTIONS */
+EvaluationResult evaluateFormula(Formula * formula);
+EvaluationResult executePropogate(CompilerState * compilerState);
+
 EvaluationResult evaluateFormula(Formula * formula) {
 	if (formula == NULL) return _invalidEvaluation();
 
