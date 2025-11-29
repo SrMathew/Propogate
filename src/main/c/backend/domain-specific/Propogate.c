@@ -81,8 +81,8 @@ static EvaluationResult _getVariableValue(const char * name) {
 		}
 		current = current->next;
 	}
-	logError(_logger, "Undefined variable accessed: %s", name);
-	return (EvaluationResult){ .succeeded = false, .value = false };
+	logDebugging(_logger, "Variable '%s' used without explicit definition. Defaulting to FALSE.", name);
+    return (EvaluationResult){ .succeeded = true, .value = false };
 }
 
 static EvaluationResult _invalidEvaluation() {
@@ -159,17 +159,26 @@ static void _processElement(Element * element, EvaluationResult * globalResult) 
 
     switch (element->elementType) {
         case MATH:
-            // Check usage of mathType inside the union, similar to destroyMath implementation
-            if (element->math != NULL && element->math->mathType == PROPOGATE) {
-                if (element->math->propogate != NULL) {
-                     logDebugging(_logger, "Processing PROPOGATE block...");
-                    _processPropogateBlock(element->math->propogate, globalResult);
+            // CORRECCIÓN: Iterar sobre la lista enlazada de nodos Math
+            // El AST define Math como una lista: struct Math { ... Math *next; ... }
+            if (element->math != NULL) {
+                Math * currentMath = element->math;
+                while (currentMath != NULL) {
+                    // Verificamos el tipo de CADA nodo en la lista
+                    if (currentMath->mathType == PROPOGATE) {
+                        if (currentMath->propogate != NULL) {
+                            logDebugging(_logger, "Processing PROPOGATE block found in Math list...");
+                            _processPropogateBlock(currentMath->propogate, globalResult);
+                        }
+                    }
+                    // Avanzamos al siguiente nodo (puede ser texto, otro propogate, o NULL)
+                    currentMath = currentMath->next;
                 }
             }
             break;
             
         case ENVIRONMENT:
-            // Environment has 'content' inside an anonymous struct within the union
+            // Environment tiene contenido recursivo
             if (element->content != NULL) {
                  logDebugging(_logger, "Entering Environment...");
                 _processContent(element->content, globalResult);
@@ -177,6 +186,7 @@ static void _processElement(Element * element, EvaluationResult * globalResult) 
             break;
             
         case TEXT_ONLY:
+            // Ignorar texto plano fuera de bloques matemáticos
             break;
     }
 }
