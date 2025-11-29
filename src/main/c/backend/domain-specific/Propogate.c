@@ -46,6 +46,17 @@ ModuleDestructor initializePropogateModule() {
 /** PRIVATE FUNCTIONS */
 /** SYMBOL TABLE */
 
+static EvaluationResult _getVariableValue(const char * name) {
+	VariableState * current = _symbolTable;
+	while (current != NULL) {
+		if (strcmp(current->name, name) == 0) {
+			return (EvaluationResult){ .succeeded = true, .value = current->value };
+		}
+		current = current->next;
+	}
+	logError(_logger, "Undefined variable accessed: %s", name);
+	return (EvaluationResult){ .succeeded = false, .value = false };
+}
 
 static EvaluationResult _invalidEvaluation() {
 	return (EvaluationResult){ .succeeded = false, .value = false };
@@ -86,6 +97,30 @@ static EvaluationResult _operateUnary(UnaryFormulaType type, EvaluationResult op
 
 
 /** PUBLIC FUNCTIONS */
+EvaluationResult evaluateFormula(Formula * formula) {
+	if (formula == NULL) return _invalidEvaluation();
+
+	switch (formula->formulaType) {
+		case VAR_FORMULA:
+			if (formula->variable != NULL) {
+				return _getVariableValue(formula->variable->name);
+			}
+			break;
+		
+		case BINARY: {
+			EvaluationResult left = evaluateFormula(formula->leftFormula);
+			EvaluationResult right = evaluateFormula(formula->rightFormula);
+			return _operateBinary(formula->binaryFormulaType, left, right);
+		}
+
+		case UNARY: {
+			EvaluationResult child = evaluateFormula(formula->formula);
+			return _operateUnary(formula->unaryFormulaType, child);
+		}
+	}
+	return _invalidEvaluation();
+}
+
 EvaluationResult executePropogate(CompilerState * compilerState) {
 	logDebugging(_logger, "Executing Propogate Module on Document Tree...");
 	
@@ -107,7 +142,6 @@ EvaluationResult executePropogate(CompilerState * compilerState) {
     }
 
 	compilerState->value = finalResult.value ? true : false;
-    // We assume succeeded is generally true unless a specific formula failed, 
-    // which is captured in finalResult
+    // We assume succeeded is generally true unless a specific formula failed
 	return finalResult;
 }
