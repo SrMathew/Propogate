@@ -1,5 +1,1 @@
-\documentclass{article}
-\begin{document}
-\newcommand{\propogate}[1]{#1}
-$\propogate{\neg(\neg(p))}$
-\end{document}
+$[!propogate]{\neg(\neg(p))}$
