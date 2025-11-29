@@ -37,9 +37,9 @@ const int main(const int length, const char ** arguments) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
 		/* logDebugging(logger, "Computing expression value...");
-		ComputationResult computationResult = executeCalculator(&compilerState);
-		if (computationResult.succeeded) {
-			compilerState.value = computationResult.value;
+		ValuationResult valuationResult = executePropogate(&compilerState);
+		if (valuationResult.succeeded) {
+			compilerState.value = valuationResult.value;
 			executeGenerator(&compilerState);
 		}
 		else {
