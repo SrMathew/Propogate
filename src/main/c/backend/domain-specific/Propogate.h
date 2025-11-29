@@ -17,40 +17,25 @@
 ModuleDestructor initializePropogateModule();
 
 /**
- * The result of a valuation. It's considered valid only if "succeed" is
- * true.
+ * The result of boolean evaluation.
  */
 typedef struct {
 	bool succeeded;
-	int value;
-} ValuationResult;
-
-typedef ValuationResult (*BinaryOperator)(const int, const int);
-
-/** Logic operations. */
-ValuationResult orOperator(const int leftAddend, const int rightAddend);
-ValuationResult andOperator(const int dividend, const int divisor);
-ValuationResult impliOperator(const int multiplicand, const int multiplier);
-
+	bool value;
+} EvaluationResult;
 
 /**
- * Computes the final value of a logic variable.
- *//*
-ValuationResult computeConstant(Constant * constant);
-
-/**
- * Computes the final value of a mathematical expression.
- *//*
-ValuationResult computeExpression(Expression * expression);
-
-/**
- * Computes the final value of a mathematical factor.
- *//*
-ValuationResult computeFactor(Factor * factor);
-
-/**
- * Computes the program value using the current compiler state.
+ * Evaluates a specific formula recursively.
+ * Exposed to allow granular testing or usage by other modules.
  */
-ValuationResult executePropogate(CompilerState * compilerState);
+EvaluationResult evaluateFormula(Formula * formula);
+
+/**
+ * Executes the logic propagation on the full program.
+ * It iterates through the expressions list, updating variable definitions
+ * and evaluating formulas.
+ * * Returns the result of the last/bigger formula evaluated in the list.
+ */
+EvaluationResult executePropogate(CompilerState * compilerState);
 
 #endif
