@@ -10,8 +10,9 @@
 #include "../../support/logging/Logger.h"
 #include "../../support/type/CompilerState.h"
 #include "../../support/type/ModuleDestructor.h"
-#include <limits.h>
+#include "../../support/language/String.h"
 #include <stdbool.h>
+
 
 /** Initialize module's internal state. */
 ModuleDestructor initializePropogateModule();
