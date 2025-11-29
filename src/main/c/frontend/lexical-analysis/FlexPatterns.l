@@ -58,7 +58,7 @@ extern CompilationStatus FalseLexemeAction();
 whitespace			[[:space:]]+
 break               [\n][\r][\t]+
 variable            [a-z]+
-formula             \\[alpha|beta|chi|delta|epsilon|eta|gamma|iota|kappa|lambda|mu|nu|omega|phi|pi|psi|rho|sigma|tau|theta|upsilon|xi|zeta]+
+formula             (\\alpha|\\beta|\\chi|\\delta|\\epsilon|\\eta|\\gamma|\\iota|\\kappa|\\lambda|\\mu|\\nu|\\omega|\\phi|\\pi|\\psi|\\rho|\\sigma|\\tau|\\theta|\\upsilon|\\xi|\\zeta)+
 %%
 
 %{
