@@ -1,5 +1,5 @@
-#ifndef CALCULATOR_HEADER
-#define CALCULATOR_HEADER
+#ifndef PROPOGATE_HEADER
+#define PROPOGATE_HEADER
 
 /**
  * We reuse the types from the AST for convenience, but you should separate
@@ -27,14 +27,14 @@ typedef struct {
 
 typedef ValuationResult (*BinaryOperator)(const int, const int);
 
-/** Arithmetic operations. */
-ValuationResult add(const int leftAddend, const int rightAddend);
-ValuationResult divide(const int dividend, const int divisor);
-ValuationResult implication(const int multiplicand, const int multiplier);
+/** Logic operations. */
+ValuationResult orOperator(const int leftAddend, const int rightAddend);
+ValuationResult andOperator(const int dividend, const int divisor);
+ValuationResult impliOperator(const int multiplicand, const int multiplier);
 
 
 /**
- * Computes the final value of a mathematical constant.
+ * Computes the final value of a logic variable.
  *//*
 ValuationResult computeConstant(Constant * constant);
 
