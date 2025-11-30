@@ -18,6 +18,8 @@ typedef struct {
 	 */
 	signed int value;
 
+	char * outputFilename;
+
 	// TODO: Add a symbol table.
 	// TODO: Add an stack to handle nested scopes.
 	// TODO: Add more configuration.

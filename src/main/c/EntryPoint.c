@@ -21,15 +21,22 @@ const int main(const int length, const char ** arguments) {
 	}
 	CompilerState compilerState = { // backend
 		.abstractSyntaxtTree = NULL,
-		.value = 0
+		.value = 0,
+        .outputFilename = "output.tex"
 	};
+
+	if (length > 1) {
+        compilerState.outputFilename = (char *)arguments[1];
+        logDebugging(logger, "Output filename set to: %s", compilerState.outputFilename);
+    }
+	
 	ModuleDestructor moduleDestructors[] = {
 		initializeAbstractSyntaxTreeModule(),
 		initializeFlexActionsModule(lexicalAnalyzer),
 		initializeBisonActionsModule(&compilerState),
 		initializeFrontendModule(lexicalAnalyzer),
 		initializePropogateModule(),
-		//initializeGeneratorModule()	--> same
+		initializeGeneratorModule()
 	};
 	CompilationStatus compilationStatus = executeSyntacticAnalysis();
 	Program * program = compilerState.abstractSyntaxtTree;
@@ -40,7 +47,8 @@ const int main(const int length, const char ** arguments) {
 		EvaluationResult valuationResult = executePropogate(&compilerState);
 		if (valuationResult.succeeded) {
 			compilerState.value = valuationResult.value;
-			//executeGenerator(&compilerState);
+			logDebugging(logger, "Final Result: %s", compilerState.value ? "TRUE" : "FALSE");
+			executeGenerator(&compilerState);
 		}
 		else {
 			logError(logger, "The computation phase rejects the input program.");
