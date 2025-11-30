@@ -127,7 +127,7 @@ formula             (\\alpha|\\beta|\\chi|\\delta|\\epsilon|\\eta|\\gamma|\\iota
 <COMMENT>.                          { return IgnoredLexemeAction(); }
 
 {break}                             { return IgnoredLexemeAction(); }
-[^\\{}#\$%\^_~\[\]\n]+              { return TextLexemeAction(); }
+[^{}#\$%\^_~\[\]\n\r\t]+                  { return TextLexemeAction(); }
 
 .									{ return IgnoredLexemeAction(); }
 
