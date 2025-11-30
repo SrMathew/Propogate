@@ -15,22 +15,15 @@ Un generador de diagramas de compuertas lógicas a partir de fórmulas de primer
 
 ## Notas de la versión
 
-Respecto a la especificación original, el proyecto presenta los siguientes cambios:
-- Se descartó el caso de aceptación 3: definir una fórmula como una variable negada sin uso de paréntesis (`\alpha = \neg p`).
-    - El motivo yace en que se deben realizar dos operaciones (definir la variable como fórmula, y aplicar el operador unario) y en la lógica propocisional esta escritura es un abuso de notación, ya que correctamente debería tener paréntesis.
-    - Se reemplazó por un caso de uso donde se anidan operadores unarios.
-- Se descartó el caso de rechazo 9: uso de un documento LaTeX mal formado.
-    - El motivo yace en que no es nuestra responsabilidad determinar si un LaTeX es válido o no.
-- Se permite utilizar fórmulas anónimas y variables sin valor asignado. Por el momento, esto se considera temporal.
-
-### Limitaciones
-
-Por el momento, las variables y fórmulas sólo pueden llamarse con letras minúsculas latinas o griegas respectivamente, a su vez múltiples para las variables y una sola para las fórmulas. Esto se extenderá al uso de subíndices en una futura versión.
-A su vez, aunque se puedan definir variables y fórmulas, estas no pueden reutilizarse aún.
-
-### Versiones futuras
-
-Está planificado implementar un alcance sobre las distintas secciones del documento LaTeX para las variables y fórmulas definidas (es decir, su definición puede cambiar entre secciones). Además, se planea permitir la identificación de compuertas lógicas que no sean un mapeo directo a los operadores lógicos de primer orden.
+Respecto a la segunda entrega, se solucionaron todos los errores marcados:
+- Warnings al construir: se eliminó la calculadora del proyecto original de CMakeLists.txt.
+- Detalles de instalación y configuración: se restauraron y tradujeron parcialmente para ser consistentes en el idioma del README.
+- Parseo de LaTeX: se redefinieron los patrones y la gramática para parsear LaTeX de forma apropiada. Cabe destacar que estos cambios fueron los protagonistas de esta última entrega.
+- Formateador: estábamos usándolo pero la entrega no tenía todos los archivos formateados. Esta vez se aplicó a todos los archivos que modificamos, y al final del README se encuentra el utilizado y su configuración.
+- Se corrigió el uso de booleanos (fue una confusión con el TP de Sistemas Operativos)
+- Se desabreviaron los nombres de algunas variables
+- Se corrigió la precedencia entre AND y OR
+- Se corrigió el uso de \__FUNCTION__ en los logueadores.
 
 ## Requisitos
 
