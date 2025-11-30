@@ -12,6 +12,8 @@
 /node_modules/
 /obj/
 /auxdoc/
+/results/
+src/test/results/
 
 # Files.
 .DS_Store

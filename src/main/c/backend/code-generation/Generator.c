@@ -342,10 +342,13 @@ static void _generateContent(Content * content) {
 
 /** PUBLIC FUNCTIONS */
 void executeGenerator(CompilerState * compilerState) {
-	logDebugging(_logger, "Opening output file: output.tex");
-	_outputFile = fopen("output.tex", "w");
+	const char * filename = compilerState->outputFilename ? compilerState->outputFilename : "output.tex";
+    
+    logDebugging(_logger, "Opening output file: %s", filename);
+    
+    _outputFile = fopen(filename, "w");
     if (_outputFile == NULL) {
-        logError(_logger, "Could not open output.tex for writing.");
+        logError(_logger, "Could not open %s for writing.", filename);
         return;
     }
 

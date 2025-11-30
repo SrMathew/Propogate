@@ -21,8 +21,15 @@ const int main(const int length, const char ** arguments) {
 	}
 	CompilerState compilerState = { // backend
 		.abstractSyntaxtTree = NULL,
-		.value = 0
+		.value = 0,
+        .outputFilename = "output.tex"
 	};
+
+	if (length > 1) {
+        compilerState.outputFilename = (char *)arguments[1];
+        logDebugging(logger, "Output filename set to: %s", compilerState.outputFilename);
+    }
+	
 	ModuleDestructor moduleDestructors[] = {
 		initializeAbstractSyntaxTreeModule(),
 		initializeFlexActionsModule(lexicalAnalyzer),
