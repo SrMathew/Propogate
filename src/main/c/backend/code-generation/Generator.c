@@ -218,8 +218,22 @@ static void _generateCircuit(Propogate * propogate) {
     }
 }
 
+/**
+ * returns true for \[...\], \(...\), $$...$$. latex delimiters
+ */
+static bool _hasDelimiters(const char * text) {
+    if (text == NULL) return false;
+    while (isspace((unsigned char)*text)) text++;
+    
+    if (strncmp(text, "\\[", 2) == 0) return true;
+    if (strncmp(text, "\\(", 2) == 0) return true;
+    if (strncmp(text, "$$", 2) == 0) return true;
+    
+    return false;
+}
+
 static void _generateMath(Math * math) {
-	bool insideMath = false; // check case: $ ... $
+	bool insideMath = false;
 
     Math * current = math;
     while (current != NULL) {
@@ -228,19 +242,27 @@ static void _generateMath(Math * math) {
                 _emit("$");
                 insideMath = false;
             } 
-
             if (current->propogate != NULL) {
                 _generateCircuit(current->propogate);
             }
-
         } else {
-			if (current->text != NULL && current->text->text != NULL) {
+            if (current->text != NULL && current->text->text != NULL) {
                 char * txt = current->text->text;
                 
-                // Whitespace and not ni mathmode --> do not print $$
-                if (!insideMath && _isWhitespace(txt)) {
-                    _emit("%s", txt);
+                // whitespaces
+                if (_isWhitespace(txt)) {
+                    if (!insideMath) _emit("%s", txt);
+                    // Si estamos dentro de $, los espacios se ignoran o se manejan dentro.
                 } 
+                // (\[...\]). prints
+                else if (_hasDelimiters(txt)) {
+                     if (insideMath) { // Cerramos si estaba abierto
+                         _emit("$");
+                         insideMath = false;
+                     }
+                     _emit("%s", txt);
+                }
+                // math text
                 else {
                     if (!insideMath) {
                         _emit("$");
@@ -252,6 +274,8 @@ static void _generateMath(Math * math) {
         }
         current = current->next;
     }
+    
+    // Si terminamos y quedó abierto, cerrar.
     if (insideMath) {
         _emit("$");
     }
