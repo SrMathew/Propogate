@@ -15,6 +15,6 @@ ModuleDestructor initializeGeneratorModule();
 /**
  * Generates the final output using the current compiler state.
  */
-void executeGenerator(CompilerState * compilerState);
+void executeGenerator(CompilerState *compilerState);
 
 #endif

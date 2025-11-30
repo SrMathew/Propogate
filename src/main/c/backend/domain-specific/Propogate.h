@@ -13,14 +13,14 @@
 #include "../../support/language/String.h"
 #include <stdbool.h>
 
-
 /** Initialize module's internal state. */
 ModuleDestructor initializePropogateModule();
 
 /**
  * The result of boolean evaluation.
  */
-typedef struct {
+typedef struct
+{
 	bool succeeded;
 	bool value;
 } EvaluationResult;
@@ -29,7 +29,7 @@ typedef struct {
  * Evaluates a specific formula recursively.
  * Exposed to allow granular testing or usage by other modules.
  */
-EvaluationResult evaluateFormula(Formula * formula);
+EvaluationResult evaluateFormula(Formula *formula);
 
 /**
  * Executes the logic propagation on the full program.
@@ -37,6 +37,6 @@ EvaluationResult evaluateFormula(Formula * formula);
  * and evaluating formulas.
  * * Returns the result of the last/bigger formula evaluated in the list.
  */
-EvaluationResult executePropogate(CompilerState * compilerState);
+EvaluationResult executePropogate(CompilerState *compilerState);
 
 #endif

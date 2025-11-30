@@ -13,57 +13,63 @@
  * parse anything inside this project instead of using Flex and Bison, I will
  * find you, and I will kill you (Bryan Mills; "Taken", 2008).
  */
-const int main(const int length, const char ** arguments) {
-	LexicalAnalyzer * lexicalAnalyzer = createLexicalAnalyzer();
-	Logger * logger = createLogger("EntryPoint");
-	for (int k = 0; k < length; ++k) {
+const int main(const int length, const char **arguments)
+{
+	LexicalAnalyzer *lexicalAnalyzer = createLexicalAnalyzer();
+	Logger *logger = createLogger("EntryPoint");
+	for (int k = 0; k < length; ++k)
+	{
 		logDebugging(logger, "Argument %d: \"%s\"", k, arguments[k]);
 	}
-	CompilerState compilerState = { // backend
-		.abstractSyntaxtTree = NULL,
-		.value = 0,
-        .outputFilename = "output.tex"
-	};
+	CompilerState compilerState = {// backend
+								   .abstractSyntaxtTree = NULL,
+								   .value = 0,
+								   .outputFilename = "output.tex"};
 
-	if (length > 1) {
-        compilerState.outputFilename = (char *)arguments[1];
-        logDebugging(logger, "Output filename set to: %s", compilerState.outputFilename);
-    }
-	
+	if (length > 1)
+	{
+		compilerState.outputFilename = (char *)arguments[1];
+		logDebugging(logger, "Output filename set to: %s", compilerState.outputFilename);
+	}
+
 	ModuleDestructor moduleDestructors[] = {
 		initializeAbstractSyntaxTreeModule(),
 		initializeFlexActionsModule(lexicalAnalyzer),
 		initializeBisonActionsModule(&compilerState),
 		initializeFrontendModule(lexicalAnalyzer),
 		initializePropogateModule(),
-		initializeGeneratorModule()
-	};
+		initializeGeneratorModule()};
 	CompilationStatus compilationStatus = executeSyntacticAnalysis();
-	Program * program = compilerState.abstractSyntaxtTree;
-	if (compilationStatus == SUCCEEDED) {
+	Program *program = compilerState.abstractSyntaxtTree;
+	if (compilationStatus == SUCCEEDED)
+	{
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
 		logDebugging(logger, "Computing expression value...");
 		EvaluationResult valuationResult = executePropogate(&compilerState);
-		if (valuationResult.succeeded) {
+		if (valuationResult.succeeded)
+		{
 			compilerState.value = valuationResult.value;
 			logDebugging(logger, "Final Result: %s", compilerState.value ? "TRUE" : "FALSE");
 			executeGenerator(&compilerState);
 		}
-		else {
+		else
+		{
 			logError(logger, "The computation phase rejects the input program.");
 			compilationStatus = FAILED;
 		}
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
 	}
-	else {
+	else
+	{
 		logError(logger, "The syntactic-analysis phase rejects the input program.");
 		compilationStatus = FAILED;
 	}
 	logDebugging(logger, "Releasing AST resources...");
 	destroyProgram(program);
-	for (int k = (sizeof(moduleDestructors)/sizeof(ModuleDestructor)) - 1; 0 <= k; --k) {
+	for (int k = (sizeof(moduleDestructors) / sizeof(ModuleDestructor)) - 1; 0 <= k; --k)
+	{
 		moduleDestructors[k]();
 	}
 	logDebugging(logger, "Compilation is done.");
