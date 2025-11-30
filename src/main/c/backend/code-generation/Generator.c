@@ -202,7 +202,6 @@ static void _generateCircuit(Propogate * propogate) {
                 if (!_isStandaloneMode) _emit("\\begin{center}\n");
                 _emit("\\begin{circuitikz}[scale=0.8, transform shape]\n");
                 
-                // 'const' agregado para mejores prácticas
                 const char * valStr = def->value ? "1" : "0";
                 
                 // Dibujo: Nodo cuadrado (valor) -> Nodo texto (nombre variable)
@@ -212,6 +211,25 @@ static void _generateCircuit(Propogate * propogate) {
                 _emit("\\end{circuitikz}\n");
                 if (!_isStandaloneMode) _emit("\\end{center}\n");
             }
+			else if(def != NULL && def->definitionType == FORM_DEF)
+			{
+				_emit("\n%% --- Form Definition ---\n");
+				double y_cursor = 0;
+                
+                if (!_isStandaloneMode) _emit("\\begin{center}\n");
+                _emit("\\begin{circuitikz}[scale=0.8, transform shape]\n");
+                             
+				NodeInfo out = _drawFormula(def->formula, &y_cursor);
+				if (out.isGate) {
+					_emit("    \\draw (%s.out) -- ++(1,0) node[anchor=west] {OUT};\n", out.id);
+				} else {
+					_emit("    \\draw (%s.east) -- ++(1,0) node[anchor=west] {OUT};\n", out.id);
+				}
+                
+                _emit("\\end{circuitikz}\n");
+                if (!_isStandaloneMode) _emit("\\end{center}\n");
+			}
+			
         }
         
         current = current->next;
@@ -345,6 +363,8 @@ void executeGenerator(CompilerState * compilerState) {
             _emit("\\usepackage{circuitikz}\n");
             _emit("\\begin{document}\n");
         }
+
+		logDebugging(_logger, "program content is: %s", program->content ? "some" : "null");
 
         if (program->content != NULL) {
             _generateContent(program->content);
