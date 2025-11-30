@@ -29,7 +29,7 @@ const int main(const int length, const char ** arguments) {
 		initializeBisonActionsModule(&compilerState),
 		initializeFrontendModule(lexicalAnalyzer),
 		initializePropogateModule(),
-		//initializeGeneratorModule()	--> same
+		initializeGeneratorModule()
 	};
 	CompilationStatus compilationStatus = executeSyntacticAnalysis();
 	Program * program = compilerState.abstractSyntaxtTree;
@@ -40,6 +40,7 @@ const int main(const int length, const char ** arguments) {
 		EvaluationResult valuationResult = executePropogate(&compilerState);
 		if (valuationResult.succeeded) {
 			compilerState.value = valuationResult.value;
+			logDebugging(logger, "Final Result: %s", compilerState.value ? "TRUE" : "FALSE");
 			executeGenerator(&compilerState);
 		}
 		else {
